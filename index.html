@@ -144,6 +144,7 @@
         }
         .toast.success { border-left: 3px solid var(--success); }
         .toast.error { border-left: 3px solid var(--danger); }
+        .toast.info { border-left: 3px solid var(--secondary); }
         @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         @media (max-width: 768px) {
@@ -154,7 +155,7 @@
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- LOGIN SCREEN -->
 <div class="login-overlay" id="loginScreen">
     <div class="login-box">
         <div class="logo">📡</div>
@@ -173,7 +174,7 @@
     </div>
 </div>
 
-<!-- APP -->
+<!-- MAIN APP CONTAINER -->
 <div class="app-container hidden" id="appContainer">
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header"><h2>📡 IPTV Manager</h2></div>
@@ -190,7 +191,7 @@
         </div>
         <div class="content-area" id="content">
             
-            <!-- GITHUB AYARLARI KARTI -->
+            <!-- GITHUB SETTINGS CARD -->
             <div class="card">
                 <div class="card-header"><h3>🛠️ GitHub API Ayarları</h3></div>
                 <div class="form-group">
@@ -213,7 +214,7 @@
                 <button class="btn btn-success" onclick="GitHubSync.pushToGitHub()">🚀 Oluşturulan M3U'yu GitHub'a Yükle</button>
             </div>
 
-            <!-- MANUEL KOPYALAMA KARTI -->
+            <!-- MANUAL CODE CARD -->
             <div class="card">
                 <div class="card-header"><h3>📝 Manuel M3U Çıktısı</h3></div>
                 <button class="btn btn-primary" onclick="App.generateAndShowM3U()" style="margin-bottom:12px;">M3U Kodu Oluştur</button>
@@ -224,12 +225,12 @@
     </main>
 </div>
 
-<!-- TOASTS -->
+<!-- TOAST BOX -->
 <div class="toast-box" id="toastBox"></div>
 
 <script>
 // ============================================================
-//  CRYPTO - Veri Şifreleme
+//  CRYPTO - Veri Şifreleme (Veritabanı Güvenliği İçin)
 // ============================================================
 const Crypto = {
     key: 'IPTV_Manager_Pro_2024_SecretKey!',
@@ -252,7 +253,7 @@ const Crypto = {
 };
 
 // ============================================================
-//  DATABASE
+//  DATABASE - LocalStorage Tabanlı Hafıza Katmanı
 // ============================================================
 const DB = {
     _data: null,
@@ -298,7 +299,7 @@ const DB = {
 };
 
 // ============================================================
-//  GITHUB SYNC ENGINE
+//  GITHUB SYNC ENGINE - GitHub REST API Entegrasyonu
 // ============================================================
 const GitHubSync = {
     async pushToGitHub() {
@@ -315,11 +316,11 @@ const GitHubSync = {
         App.showToast('GitHub ile bağlantı kuruluyor...', 'info');
 
         const m3uContent = DB.generateM3U();
-        const apiUrl = `https://api.github.com/v1/repos/${user}/${repo}/contents/${path}`;
+        const apiUrl = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
         
         let sha = null;
 
-        // 1. Adım: Dosya zaten var mı diye kontrol et ve varsa SHA kodunu al (Üzerine yazabilmek için şart)
+        // 1. Adım: Mevcut dosyanın SHA değerini sorgula (Üzerine yazmak için zorunlu)
         try {
             const res = await fetch(apiUrl, {
                 headers: { 'Authorization': `token ${token}` }
@@ -329,19 +330,19 @@ const GitHubSync = {
                 sha = fileData.sha;
             }
         } catch (e) {
-            console.log("Dosya kontrolü esnasında hata veya dosya ilk kez oluşturuluyor.");
+            console.log("Dosya kontrolü esnasında hata oluştu veya dosya ilk kez oluşturuluyor.");
         }
 
-        // 2. Adım: Dosyayı Base64 formatına çevir ve push et
+        // 2. Adım: Dosya içeriğini Base64 formatına güvenli dönüştür
         const base64Content = btoa(unescape(encodeURIComponent(m3uContent)));
         
         const bodyData = {
-            message: "IPTV Manager Pro - Otomatik Güncelleme",
+            message: "IPTV Manager Pro - Otomatik Güncelleme (2026)",
             content: base64Content,
             branch: "main"
         };
 
-        if (sha) bodyData.sha = sha; // Eğer dosya varsa SHA ekleyerek update durumuna geçiriyoruz
+        if (sha) bodyData.sha = sha; // Dosya mevcutsa güncelleme için SHA ekle
 
         try {
             const response = await fetch(apiUrl, {
@@ -354,32 +355,46 @@ const GitHubSync = {
             });
 
             if (response.status === 200 || response.status === 201) {
-                App.showToast('M3U Dosyası Başarıyla GitHub\'a Import Edildi! 🎉', 'success');
+                App.showToast('M3U Dosyası Başarıyla GitHub\'a Aktarıldı! 🎉', 'success');
             } else {
                 const errRes = await response.json();
                 App.showToast(`GitHub Hatası: ${errRes.message}`, 'error');
             }
         } catch (error) {
-            App.showToast('İstek gönderilirken hata oluştu.', 'error');
+            App.showToast('İstek gönderilirken ağ hatası oluştu.', 'error');
         }
     }
 };
 
 // ============================================================
-//  APP APPLICATION MANAGEMENT
+//  APP APPLICATION MANAGEMENT - Sayfa Dinamik Kontrolleri
 // ============================================================
 const App = {
     doLogin() {
-        const u = document.getElementById('loginUser').value;
-        const p = document.getElementById('loginPass').value;
-        if (u === DB.data.config.username && p === DB.data.config.password) {
+        const userInput = document.getElementById('loginUser');
+        const passInput = document.getElementById('loginPass');
+        
+        if (!userInput || !passInput) {
+            this.showToast('Giriş form elemanları bulunamadı!', 'error');
+            return;
+        }
+
+        const u = userInput.value.trim();
+        const p = passInput.value.trim();
+
+        const dbData = DB.load();
+        const validUser = dbData.config?.username || 'admin';
+        const validPass = dbData.config?.password || 'admin123';
+
+        if (u === validUser && p === validPass) {
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('appContainer').classList.remove('hidden');
-            this.showToast('Başarıyla giriş yapıldı.', 'success');
+            this.showToast('Başarıyla giriş yapıldı. Hoş geldiniz!', 'success');
             
-            // LocalStorage'dan daha önce kaydedilen GitHub Token'ı geri yükle
+            // Kaydedilmiş bir token varsa otomatik kutuya yazdır
             if(localStorage.getItem('gh_token_saved')) {
-                document.getElementById('ghToken').value = localStorage.getItem('gh_token_saved');
+                const ghTokenField = document.getElementById('ghToken');
+                if (ghTokenField) ghTokenField.value = localStorage.getItem('gh_token_saved');
             }
         } else {
             this.showToast('Hatalı kullanıcı adı veya şifre!', 'error');
@@ -388,27 +403,39 @@ const App = {
     logout() {
         document.getElementById('appContainer').classList.add('hidden');
         document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('loginUser').value = '';
+        document.getElementById('loginPass').value = '';
     },
     navigate(page) {
-        this.showToast(`${page} sayfasına geçildi (Örnek Tasarım)`, 'success');
+        this.showToast(`${page} sayfasına geçildi.`, 'success');
     },
     generateAndShowM3U() {
-        document.getElementById('m3uOutput').value = DB.generateM3U();
-        this.showToast('M3U içeriği aşağıya aktarıldı.', 'success');
+        const outputField = document.getElementById('m3uOutput');
+        if (outputField) {
+            outputField.value = DB.generateM3U();
+            this.showToast('M3U içeriği aşağıya aktarıldı.', 'success');
+        }
     },
     showToast(msg, type = 'success') {
         const box = document.getElementById('toastBox');
+        if (!box) return;
+        
         const t = document.createElement('div');
         t.className = `toast ${type}`;
         t.innerText = msg;
         box.appendChild(t);
         setTimeout(() => t.remove(), 4000);
         
-        // Token girilmişse her işlemde localstorage'a yedekle ki gitmesin
+        // Token girilmişse her başarılı işlem/toast tetiklendiğinde yedekle
         const tokenInput = document.getElementById('ghToken');
         if (tokenInput && tokenInput.value) {
             localStorage.setItem('gh_token_saved', tokenInput.value);
         }
+    },
+    closeModal() {
+        // Modal kapatma fallback logic
+        const modal = document.getElementById('modalOverlay');
+        if (modal) modal.classList.remove('active');
     }
 };
 </script>
