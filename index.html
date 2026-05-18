@@ -83,36 +83,99 @@
         .stat-value { font-size: 26px; font-weight: 700; }
         .stat-label { font-size: 12px; color: var(--text-muted); }
         .group-list, .channel-list { display: flex; flex-direction: column; gap: 6px; }
-        .group-item, .channel-item { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; display: flex; align-items: center; transition: 0.2s; }
-        .group-item:hover, .channel-item:hover { border-color: var(--primary); }
-        .group-item.dragging, .channel-item.dragging { opacity: 0.4; }
-        .group-item { justify-content: space-between; cursor: grab; }
+        .group-item { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; display: flex; align-items: center; transition: 0.2s; justify-content: space-between; cursor: grab; }
+        .group-item:hover { border-color: var(--primary); }
+        .group-item.dragging { opacity: 0.4; }
         .group-info { display: flex; align-items: center; gap: 10px; flex: 1; }
         .drag-handle, .ch-drag { color: var(--dark-4); cursor: grab; font-size: 16px; user-select: none; }
         .group-name { font-weight: 600; font-size: 14px; }
         .group-count { font-size: 11px; color: var(--text-muted); background: var(--dark-3); padding: 2px 8px; border-radius: 10px; }
         .group-actions, .ch-actions { display: flex; gap: 5px; flex-shrink: 0; }
-        .channel-item { gap: 10px; }
+
+        /* ===== KANAL ITEM - DÜZELTME: TAŞMA SORUNU ===== */
+        .channel-item {
+            background: var(--dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .channel-item:hover { border-color: var(--primary); }
+        .channel-item.dragging { opacity: 0.4; }
         .channel-item.inactive { opacity: 0.45; }
-        .ch-checkbox { accent-color: var(--primary); width: 15px; height: 15px; cursor: pointer; }
+
+        .ch-top-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .ch-checkbox { accent-color: var(--primary); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
         .ch-logo { width: 34px; height: 34px; border-radius: 6px; object-fit: contain; background: var(--dark-3); flex-shrink: 0; }
         .ch-logo-ph { width: 34px; height: 34px; border-radius: 6px; background: var(--dark-3); display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--dark-4); flex-shrink: 0; }
-        .ch-info { flex: 1; min-width: 0; }
-        .ch-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ch-url { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Consolas', monospace; }
+
+        .ch-info {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .ch-name {
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ch-url {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'Consolas', monospace;
+            word-break: break-all;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .ch-bottom-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            padding-left: 36px;
+            flex-wrap: wrap;
+        }
+
         .ch-status { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
         .ch-status.on { background: var(--success); box-shadow: 0 0 6px var(--success); }
         .ch-status.off { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
         .ch-status.unknown { background: var(--dark-4); }
         .ch-status.checking { background: var(--warning); animation: pulse 1s infinite; }
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+
         .status-text { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
         .status-text.on { background: rgba(16,185,129,0.15); color: var(--success); }
         .status-text.off { background: rgba(239,68,68,0.15); color: var(--danger); }
         .status-text.unknown { background: rgba(71,85,105,0.3); color: var(--text-muted); }
         .status-text.checking { background: rgba(245,158,11,0.15); color: var(--warning); }
+
         .badge { padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
         .badge-primary { background: rgba(99,102,241,0.2); color: var(--primary-light); }
+
+        .ch-actions-wrap {
+            margin-left: auto;
+            display: flex;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
         .toggle { position: relative; width: 40px; height: 22px; cursor: pointer; flex-shrink: 0; }
         .toggle input { display: none; }
         .toggle-sl { position: absolute; inset: 0; background: var(--dark-4); border-radius: 11px; transition: 0.3s; }
@@ -165,14 +228,19 @@
         .github-status.connected { background: rgba(16,185,129,0.15); color: var(--success); }
         .github-status.disconnected { background: rgba(239,68,68,0.15); color: var(--danger); }
         .github-info { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin: 12px 0; }
-        .github-info .gi-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid var(--border); }
+        .github-info .gi-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 4px; }
         .github-info .gi-row:last-child { border-bottom: none; }
         .github-info .gi-label { color: var(--text-muted); }
-        .github-info .gi-value { color: var(--text); font-family: 'Consolas', monospace; font-size: 12px; }
+        .github-info .gi-value { color: var(--text); font-family: 'Consolas', monospace; font-size: 12px; word-break: break-all; }
         .sync-log { background: var(--dark); border: 1px solid var(--border); border-radius: 8px; padding: 14px; max-height: 200px; overflow-y: auto; margin-top: 12px; font-family: 'Consolas', monospace; font-size: 12px; line-height: 1.8; }
         .sync-log .log-ok { color: var(--success); }
         .sync-log .log-err { color: var(--danger); }
         .sync-log .log-info { color: var(--secondary); }
+
+        .token-saved { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .token-saved .ts-text { flex: 1; font-size: 13px; color: var(--success); }
+        .token-mask { font-family: 'Consolas', monospace; font-size: 13px; color: var(--text-muted); }
+
         .fade-in { animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .loading-spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--dark-4); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
@@ -243,33 +311,25 @@
 <div class="toast-box" id="toastBox"></div>
 
 <script>
-// ============================================================
-//  CRYPTO
-// ============================================================
 const Crypto={
     key:'IPTV_Manager_Pro_2024_Secret!',
     encrypt(d){const j=JSON.stringify(d);let r='';for(let i=0;i<j.length;i++)r+=String.fromCharCode(j.charCodeAt(i)^this.key.charCodeAt(i%this.key.length));return btoa(unescape(encodeURIComponent(r)))},
     decrypt(e){try{const d=decodeURIComponent(escape(atob(e)));let r='';for(let i=0;i<d.length;i++)r+=String.fromCharCode(d.charCodeAt(i)^this.key.charCodeAt(i%this.key.length));return JSON.parse(r)}catch{return null}}
 };
 
-// ============================================================
-//  DATABASE
-// ============================================================
 const DB={
     _d:null,
-    def(){return{config:{username:'admin',password:'admin123'},github:{token:'',owner:'kadirsener1',repo:'tivim',path:'merged1.m3u',branch:'main',autoSync:false,lastSync:null},groups:[],channels:[],nGid:1,nCid:1}},
-    load(){if(this._d)return this._d;const r=localStorage.getItem('iptv_mgr_pro2');if(!r){this._d=this.def();this.save();return this._d}const d=Crypto.decrypt(r);this._d=d||this.def();
-    if(!this._d.github)this._d.github={token:'',owner:'kadirsener1',repo:'tivim',path:'merged1.m3u',branch:'main',autoSync:false,lastSync:null};
-    return this._d},
-    save(){localStorage.setItem('iptv_mgr_pro2',Crypto.encrypt(this._d))},
+    def(){return{config:{username:'admin',password:'admin123'},github:{token:'',owner:'kadirsener1',repo:'tivim',path:'merged1.m3u',branch:'main',lastSync:null},groups:[],channels:[],nGid:1,nCid:1}},
+    load(){if(this._d)return this._d;const r=localStorage.getItem('iptv_mgr_v3');if(!r){this._d=this.def();this.save();return this._d}const d=Crypto.decrypt(r);this._d=d||this.def();if(!this._d.github)this._d.github=this.def().github;return this._d},
+    save(){localStorage.setItem('iptv_mgr_v3',Crypto.encrypt(this._d))},
     get data(){return this.load()},
     getGroups(){return[...this.data.groups].sort((a,b)=>a.order-b.order)},
-    addGroup(n,ic=''){const g={id:this.data.nGid++,name:n,icon:ic,order:this.data.groups.length,created:Date.now()};this.data.groups.push(g);this.save();return g},
+    addGroup(n,ic=''){const g={id:this.data.nGid++,name:n,icon:ic,order:this.data.groups.length};this.data.groups.push(g);this.save();return g},
     updateGroup(id,n,ic){const g=this.data.groups.find(x=>x.id===id);if(g){g.name=n;g.icon=ic||'';this.save()}},
     deleteGroup(id){this.data.groups=this.data.groups.filter(x=>x.id!==id);this.data.channels=this.data.channels.filter(x=>x.groupId!==id);this.save()},
     reorderGroups(ids){ids.forEach((id,i)=>{const g=this.data.groups.find(x=>x.id===id);if(g)g.order=i});this.save()},
     getChannels(gid=null){let c=[...this.data.channels];if(gid!==null)c=c.filter(x=>x.groupId===gid);return c.sort((a,b)=>a.order-b.order)},
-    addChannel(gid,n,url,logo='',epg=''){const mx=this.data.channels.filter(x=>x.groupId===gid).reduce((m,c)=>Math.max(m,c.order),-1);const ch={id:this.data.nCid++,groupId:gid,name:n,url,logo,epgId:epg,order:mx+1,active:true,status:'unknown',lastCheck:null,created:Date.now()};this.data.channels.push(ch);this.save();return ch},
+    addChannel(gid,n,url,logo='',epg=''){const mx=this.data.channels.filter(x=>x.groupId===gid).reduce((m,c)=>Math.max(m,c.order),-1);const ch={id:this.data.nCid++,groupId:gid,name:n,url,logo,epgId:epg,order:mx+1,active:true,status:'unknown'};this.data.channels.push(ch);this.save();return ch},
     updateChannel(id,f){const c=this.data.channels.find(x=>x.id===id);if(c){Object.assign(c,f);this.save()}},
     deleteChannel(id){this.data.channels=this.data.channels.filter(x=>x.id!==id);this.save()},
     deleteChannels(ids){this.data.channels=this.data.channels.filter(x=>!ids.includes(x.id));this.save()},
@@ -284,123 +344,87 @@ const DB={
     importJSON(j){try{const d=JSON.parse(j);if(d.groups&&d.channels){this._d=d;this.save();return true}}catch{}return false}
 };
 
-// ============================================================
-//  GITHUB API
-// ============================================================
 const GitHub={
     get cfg(){return DB.data.github},
-
-    async getFile(){
-        const{token,owner,repo,path,branch}=this.cfg;
-        const r=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`,{
-            headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}
-        });
-        if(r.status===404)return{exists:false,sha:null};
-        if(!r.ok)throw new Error(`GitHub API hata: ${r.status}`);
-        const d=await r.json();
-        return{exists:true,sha:d.sha,content:atob(d.content.replace(/\n/g,''))};
-    },
-
-    async pushFile(content,message='IPTV Manager: Playlist güncellendi'){
-        const{token,owner,repo,path,branch}=this.cfg;
-        let sha=null;
-        try{const f=await this.getFile();sha=f.sha}catch{}
-        const body={message,content:btoa(unescape(encodeURIComponent(content))),branch};
-        if(sha)body.sha=sha;
-
-        const r=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`,{
-            method:'PUT',
-            headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-            body:JSON.stringify(body)
-        });
-        if(!r.ok){const e=await r.json();throw new Error(e.message||`Hata: ${r.status}`)}
-        return await r.json();
-    },
-
-    async testConnection(){
-        const{token,owner,repo}=this.cfg;
-        if(!token)throw new Error('Token girilmemiş');
-        const r=await fetch(`https://api.github.com/repos/${owner}/${repo}`,{
-            headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}
-        });
-        if(!r.ok)throw new Error(`Bağlantı hatası: ${r.status}`);
-        return await r.json();
-    },
-
-    async syncNow(){
-        const m3u=DB.generateM3U();
-        const ts=new Date().toLocaleString('tr-TR');
-        const stats=DB.stats();
-        const msg=`Playlist güncellendi - ${stats.active} kanal - ${ts}`;
-        const result=await this.pushFile(m3u,msg);
-        DB.data.github.lastSync=Date.now();
-        DB.save();
-        return result;
-    },
-
-    getRawUrl(){
-        const{owner,repo,path,branch}=this.cfg;
-        return`https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/${branch}/${path}`;
-    }
+    async getFile(){const{token,owner,repo,path,branch}=this.cfg;const r=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`,{headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}});if(r.status===404)return{exists:false,sha:null};if(!r.ok)throw new Error(`API hata: ${r.status}`);const d=await r.json();return{exists:true,sha:d.sha,content:atob(d.content.replace(/\n/g,''))}},
+    async pushFile(content,message='Playlist güncellendi'){const{token,owner,repo,path,branch}=this.cfg;let sha=null;try{const f=await this.getFile();sha=f.sha}catch{}const body={message,content:btoa(unescape(encodeURIComponent(content))),branch};if(sha)body.sha=sha;const r=await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`,{method:'PUT',headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok){const e=await r.json();throw new Error(e.message||r.status)}return await r.json()},
+    async testConnection(){const{token,owner,repo}=this.cfg;if(!token)throw new Error('Token yok');const r=await fetch(`https://api.github.com/repos/${owner}/${repo}`,{headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json'}});if(!r.ok)throw new Error(`Hata: ${r.status}`);return await r.json()},
+    async syncNow(){const m3u=DB.generateM3U();const ts=new Date().toLocaleString('tr-TR');const s=DB.stats();const msg=`Playlist güncellendi - ${s.active} kanal - ${ts}`;const result=await this.pushFile(m3u,msg);DB.data.github.lastSync=Date.now();DB.save();return result},
+    getRawUrl(){const{owner,repo,path,branch}=this.cfg;return`https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/${branch}/${path}`},
+    maskToken(t){if(!t||t.length<8)return'***';return t.substring(0,4)+'••••••••'+t.substring(t.length-4)}
 };
 
-// ============================================================
-//  CHECKER
-// ============================================================
 const Checker={
     checking:false,aborted:false,checked:0,total:0,results:{online:0,offline:0},
-    async checkUrl(url,timeout=8000){
-        try{const c=new AbortController();const t=setTimeout(()=>c.abort(),timeout);
-        try{await fetch(url,{method:'HEAD',mode:'no-cors',signal:c.signal,cache:'no-cache'});clearTimeout(t);return true}
-        catch(e){clearTimeout(t);if(e.name==='AbortError')return false;return await this.checkMedia(url,timeout)}}catch{return false}},
+    async checkUrl(url,timeout=8000){try{const c=new AbortController();const t=setTimeout(()=>c.abort(),timeout);try{await fetch(url,{method:'HEAD',mode:'no-cors',signal:c.signal,cache:'no-cache'});clearTimeout(t);return true}catch(e){clearTimeout(t);if(e.name==='AbortError')return false;return await this.checkMedia(url,timeout)}}catch{return false}},
     checkMedia(url,timeout=8000){return new Promise(res=>{const t=setTimeout(()=>res(false),timeout);const v=document.createElement('video');v.muted=true;v.preload='metadata';v.onloadedmetadata=()=>{clearTimeout(t);v.src='';res(true)};v.onerror=()=>{clearTimeout(t);v.src='';res(false)};v.src=url})},
     async checkSingle(id){const ch=DB.data.channels.find(x=>x.id===id);if(!ch)return;DB.updateChannel(id,{status:'checking'});App.updateChSt(id,'checking');const ok=await this.checkUrl(ch.url);const st=ok?'online':'offline';DB.updateChannel(id,{status:st,lastCheck:Date.now()});App.updateChSt(id,st);return st},
-    async checkAll(chs){if(this.checking)return;this.checking=true;this.aborted=false;this.checked=0;this.total=chs.length;this.results={online:0,offline:0};App.updateProg(0,this.total,this.results);const bs=5;for(let i=0;i<chs.length;i+=bs){if(this.aborted)break;const batch=chs.slice(i,i+bs);await Promise.all(batch.map(async ch=>{if(this.aborted)return;DB.updateChannel(ch.id,{status:'checking'});const ok=await this.checkUrl(ch.url);const st=ok?'online':'offline';DB.updateChannel(ch.id,{status:st,lastCheck:Date.now()});ok?this.results.online++:this.results.offline++;this.checked++;App.updateProg(this.checked,this.total,this.results)}))}this.checking=false;DB.save();if(!this.aborted)App.toast(`Tamamlandı: ${this.results.online} çevrimiçi, ${this.results.offline} çevrimdışı`,'success');App.renderCheckRes()},
+    async checkAll(chs){if(this.checking)return;this.checking=true;this.aborted=false;this.checked=0;this.total=chs.length;this.results={online:0,offline:0};App.updateProg(0,this.total,this.results);const bs=5;for(let i=0;i<chs.length;i+=bs){if(this.aborted)break;await Promise.all(chs.slice(i,i+bs).map(async ch=>{if(this.aborted)return;DB.updateChannel(ch.id,{status:'checking'});const ok=await this.checkUrl(ch.url);const st=ok?'online':'offline';DB.updateChannel(ch.id,{status:st,lastCheck:Date.now()});ok?this.results.online++:this.results.offline++;this.checked++;App.updateProg(this.checked,this.total,this.results)}))}this.checking=false;DB.save();if(!this.aborted)App.toast(`Tamamlandı: ${this.results.online} çevrimiçi, ${this.results.offline} çevrimdışı`,'success');App.renderCheckRes()},
     stop(){this.aborted=true;this.checking=false}
 };
 
-// ============================================================
-//  LINK SERVER
-// ============================================================
-const LinkServer={
-    url:null,
-    generate(){this.revoke();const b=new Blob([DB.generateM3U()],{type:'application/x-mpegurl'});this.url=URL.createObjectURL(b);return this.url},
-    revoke(){if(this.url){URL.revokeObjectURL(this.url);this.url=null}},
-    dataUrl(){return'data:application/x-mpegurl;charset=utf-8,'+encodeURIComponent(DB.generateM3U())}
-};
+const LinkServer={url:null,generate(){this.revoke();const b=new Blob([DB.generateM3U()],{type:'application/x-mpegurl'});this.url=URL.createObjectURL(b);return this.url},revoke(){if(this.url){URL.revokeObjectURL(this.url);this.url=null}}};
 
-// ============================================================
-//  APP
-// ============================================================
 const App={
     loggedIn:false,currentPage:'dashboard',currentGroupId:null,selected:new Set(),dragEl:null,
 
-    doLogin(){const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value,c=DB.data.config;if(u===c.username&&p===c.password){this.loggedIn=true;document.getElementById('loginScreen').classList.add('hidden');document.getElementById('appContainer').classList.remove('hidden');this.navigate('dashboard');this.toast('Hoş geldiniz! 👋','success')}else this.toast('Geçersiz bilgiler','error')},
+    doLogin(){const u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value;if(u===DB.data.config.username&&p===DB.data.config.password){this.loggedIn=true;document.getElementById('loginScreen').classList.add('hidden');document.getElementById('appContainer').classList.remove('hidden');this.navigate('dashboard');this.toast('Hoş geldiniz! 👋','success')}else this.toast('Geçersiz bilgiler','error')},
     logout(){this.loggedIn=false;LinkServer.revoke();document.getElementById('loginScreen').classList.remove('hidden');document.getElementById('appContainer').classList.add('hidden');document.getElementById('loginUser').value=document.getElementById('loginPass').value=''},
 
     navigate(p){this.currentPage=p;this.selected.clear();document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));const n=document.querySelector(`.nav-item[data-page="${p}"]`);if(n)n.classList.add('active');const t={dashboard:'Gösterge Paneli',groups:'Grup Yönetimi',channels:'Kanal Yönetimi',checker:'Kanal Kontrolü',bulk:'Toplu Link Değiştirme',import:'M3U İçe Aktar',export:'M3U Dışa Aktar',github:'GitHub Sync',settings:'Ayarlar'};document.getElementById('pageTitle').textContent=t[p]||'';({dashboard:()=>this.pageDash(),groups:()=>this.pageGroups(),channels:()=>this.pageCh(),checker:()=>this.pageCheck(),bulk:()=>this.pageBulk(),import:()=>this.pageImport(),export:()=>this.pageExport(),github:()=>this.pageGitHub(),settings:()=>this.pageSettings()}[p]||this.pageDash)();document.getElementById('sidebar').classList.remove('open')},
 
-    // DASHBOARD
-    pageDash(){document.getElementById('topActions').innerHTML='';const s=DB.stats();const gh=DB.data.github;const ghSt=gh.token?'connected':'disconnected';document.getElementById('content').innerHTML=`<div class="stats-grid fade-in"><div class="stat-card"><div class="stat-icon blue">📁</div><div><div class="stat-value">${s.groups}</div><div class="stat-label">Grup</div></div></div><div class="stat-card"><div class="stat-icon green">📺</div><div><div class="stat-value">${s.channels}</div><div class="stat-label">Kanal</div></div></div><div class="stat-card"><div class="stat-icon yellow">✅</div><div><div class="stat-value">${s.active}</div><div class="stat-label">Aktif</div></div></div><div class="stat-card"><div class="stat-icon cyan">🟢</div><div><div class="stat-value">${s.online}</div><div class="stat-label">Çevrimiçi</div></div></div><div class="stat-card"><div class="stat-icon red">🔴</div><div><div class="stat-value">${s.offline}</div><div class="stat-label">Çevrimdışı</div></div></div></div><div class="card fade-in"><div class="card-header"><h3>🐙 GitHub Durumu</h3><span class="github-status ${ghSt}">${gh.token?'● Bağlı':'○ Bağlı Değil'}</span></div><p style="font-size:13px;color:var(--text-muted)">M3U Linki: <a href="${GitHub.getRawUrl()}" target="_blank" style="color:var(--secondary)">${GitHub.getRawUrl()}</a></p>${gh.lastSync?`<p style="font-size:12px;color:var(--text-muted);margin-top:6px">Son sync: ${new Date(gh.lastSync).toLocaleString('tr-TR')}</p>`:''}<div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-github btn-sm" onclick="App.navigate('github')">⚙️ GitHub Ayarları</button>${gh.token?`<button class="btn btn-success btn-sm" onclick="App.quickSync()">🚀 Hızlı Sync</button>`:''}</div></div><div class="card fade-in"><div class="card-header"><h3>🚀 Hızlı İşlemler</h3></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px"><button class="btn btn-primary" onclick="App.navigate('groups')">📁 Gruplar</button><button class="btn btn-success" onclick="App.navigate('channels')">📺 Kanallar</button><button class="btn btn-warning" onclick="App.navigate('checker')">🩺 Kontrol</button><button class="btn btn-secondary" onclick="App.navigate('export')">📤 Dışa Aktar</button></div></div>`},
+    pageDash(){document.getElementById('topActions').innerHTML='';const s=DB.stats(),gh=DB.data.github;document.getElementById('content').innerHTML=`<div class="stats-grid fade-in"><div class="stat-card"><div class="stat-icon blue">📁</div><div><div class="stat-value">${s.groups}</div><div class="stat-label">Grup</div></div></div><div class="stat-card"><div class="stat-icon green">📺</div><div><div class="stat-value">${s.channels}</div><div class="stat-label">Kanal</div></div></div><div class="stat-card"><div class="stat-icon yellow">✅</div><div><div class="stat-value">${s.active}</div><div class="stat-label">Aktif</div></div></div><div class="stat-card"><div class="stat-icon cyan">🟢</div><div><div class="stat-value">${s.online}</div><div class="stat-label">Çevrimiçi</div></div></div><div class="stat-card"><div class="stat-icon red">🔴</div><div><div class="stat-value">${s.offline}</div><div class="stat-label">Çevrimdışı</div></div></div></div><div class="card fade-in"><div class="card-header"><h3>🐙 GitHub</h3><span class="github-status ${gh.token?'connected':'disconnected'}">${gh.token?'● Bağlı':'○ Bağlı Değil'}</span></div>${gh.lastSync?`<p style="font-size:12px;color:var(--text-muted)">Son sync: ${new Date(gh.lastSync).toLocaleString('tr-TR')}</p>`:''}<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">${gh.token?`<button class="btn btn-success btn-sm" onclick="App.quickSync()">🚀 GitHub'a Gönder</button>`:`<button class="btn btn-github btn-sm" onclick="App.navigate('github')">⚙️ Token Ayarla</button>`}</div></div><div class="card fade-in"><div class="card-header"><h3>🚀 Hızlı İşlemler</h3></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px"><button class="btn btn-primary" onclick="App.navigate('groups')">📁 Gruplar</button><button class="btn btn-success" onclick="App.navigate('channels')">📺 Kanallar</button><button class="btn btn-warning" onclick="App.navigate('checker')">🩺 Kontrol</button><button class="btn btn-secondary" onclick="App.navigate('export')">📤 Dışa Aktar</button></div></div>`},
 
-    async quickSync(){try{this.toast('GitHub\'a gönderiliyor...','info');await GitHub.syncNow();this.toast('GitHub\'a başarıyla gönderildi! ✅','success');this.pageDash()}catch(e){this.toast('Hata: '+e.message,'error')}},
+    async quickSync(){try{this.toast('Gönderiliyor...','info');await GitHub.syncNow();this.toast('GitHub\'a gönderildi! ✅','success');if(this.currentPage==='dashboard')this.pageDash()}catch(e){this.toast('Hata: '+e.message,'error')}},
 
     // GROUPS
-    pageGroups(){document.getElementById('topActions').innerHTML=`<button class="btn btn-primary btn-sm" onclick="App.showGrpModal()">➕ Yeni Grup</button>`;const gs=DB.getGroups(),cm={};DB.data.channels.forEach(c=>cm[c.groupId]=(cm[c.groupId]||0)+1);if(!gs.length){document.getElementById('content').innerHTML=`<div class="empty-state fade-in"><div class="empty-icon">📁</div><h3>Henüz Grup Yok</h3><button class="btn btn-primary" onclick="App.showGrpModal()">➕ İlk Grubu Oluştur</button></div>`;return}document.getElementById('content').innerHTML=`<div class="card fade-in"><div class="card-header"><h3>📁 Gruplar (${gs.length})</h3><span style="font-size:11px;color:var(--text-muted)">Sürükleyerek sıralayın</span></div><div class="group-list" id="gList">${gs.map(g=>`<div class="group-item" draggable="true" data-id="${g.id}" ondragstart="App.dS(event)" ondragover="App.dO(event)" ondrop="App.dDG(event)" ondragend="App.dE(event)"><div class="group-info"><span class="drag-handle">⠿</span><span class="group-name">${this.esc(g.name)}</span><span class="group-count">${cm[g.id]||0}</span></div><div class="group-actions"><button class="btn btn-sm btn-outline btn-icon" onclick="App.currentGroupId=${g.id};App.navigate('channels')">📺</button><button class="btn btn-sm btn-outline btn-icon" onclick="App.showGrpModal(${g.id})">✏️</button><button class="btn btn-sm btn-danger btn-icon" onclick="App.delGrp(${g.id})">🗑️</button></div></div>`).join('')}</div></div>`},
+    pageGroups(){document.getElementById('topActions').innerHTML=`<button class="btn btn-primary btn-sm" onclick="App.showGrpModal()">➕ Yeni Grup</button>`;const gs=DB.getGroups(),cm={};DB.data.channels.forEach(c=>cm[c.groupId]=(cm[c.groupId]||0)+1);if(!gs.length){document.getElementById('content').innerHTML=`<div class="empty-state fade-in"><div class="empty-icon">📁</div><h3>Henüz Grup Yok</h3><button class="btn btn-primary" onclick="App.showGrpModal()">➕ Oluştur</button></div>`;return}document.getElementById('content').innerHTML=`<div class="card fade-in"><div class="card-header"><h3>📁 Gruplar (${gs.length})</h3></div><div class="group-list" id="gList">${gs.map(g=>`<div class="group-item" draggable="true" data-id="${g.id}" ondragstart="App.dS(event)" ondragover="App.dO(event)" ondrop="App.dDG(event)" ondragend="App.dE(event)"><div class="group-info"><span class="drag-handle">⠿</span><span class="group-name">${this.esc(g.name)}</span><span class="group-count">${cm[g.id]||0}</span></div><div class="group-actions"><button class="btn btn-sm btn-outline btn-icon" onclick="App.currentGroupId=${g.id};App.navigate('channels')">📺</button><button class="btn btn-sm btn-outline btn-icon" onclick="App.showGrpModal(${g.id})">✏️</button><button class="btn btn-sm btn-danger btn-icon" onclick="App.delGrp(${g.id})">🗑️</button></div></div>`).join('')}</div></div>`},
     showGrpModal(id=null){const g=id?DB.data.groups.find(x=>x.id===id):null;this.openModal(`<div class="modal-header"><h3>${g?'✏️ Düzenle':'➕ Yeni Grup'}</h3><button class="modal-close" onclick="App.closeModal()">✕</button></div><div class="modal-body"><div class="form-group"><label>Grup Adı</label><input type="text" id="mGN" class="form-control" value="${g?this.escA(g.name):''}"></div><div class="form-group"><label>İkon</label><input type="text" id="mGI" class="form-control" value="${g?this.escA(g.icon||''):''}"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="App.closeModal()">İptal</button><button class="btn btn-primary" onclick="App.saveGrp(${id})">${g?'💾 Güncelle':'➕ Oluştur'}</button></div>`);document.getElementById('mGN').focus()},
     saveGrp(id){const n=document.getElementById('mGN').value.trim(),ic=document.getElementById('mGI').value.trim();if(!n)return this.toast('Ad gerekli','error');id?DB.updateGroup(id,n,ic):DB.addGroup(n,ic);this.toast(id?'Güncellendi ✅':'Oluşturuldu ✅','success');this.closeModal();this.pageGroups()},
     delGrp(id){const g=DB.data.groups.find(x=>x.id===id),c=DB.data.channels.filter(x=>x.groupId===id).length;this.openModal(`<div class="modal-header"><h3>⚠️ Sil</h3><button class="modal-close" onclick="App.closeModal()">✕</button></div><div class="modal-body"><p>"${this.esc(g?.name)}" silinsin mi?</p>${c?`<p style="color:var(--danger);margin-top:8px;font-size:13px">⚠️ ${c} kanal da silinecek!</p>`:''}</div><div class="modal-footer"><button class="btn btn-secondary" onclick="App.closeModal()">İptal</button><button class="btn btn-danger" onclick="DB.deleteGroup(${id});App.closeModal();App.toast('Silindi','success');App.pageGroups()">🗑️</button></div>`)},
 
-    // CHANNELS
+    // CHANNELS - YENİ LAYOUT
     pageCh(){const gs=DB.getGroups();document.getElementById('topActions').innerHTML=`<button class="btn btn-primary btn-sm" onclick="App.showChModal()">➕ Yeni Kanal</button>`;const gid=this.currentGroupId,chs=DB.getChannels(gid?parseInt(gid):null);let h=`<div class="card fade-in"><div class="toolbar"><div class="toolbar-left"><select class="form-control" id="chGF" onchange="App.currentGroupId=this.value||null;App.pageCh()" style="max-width:220px"><option value="">Tüm Gruplar</option>${gs.map(g=>`<option value="${g.id}" ${gid==g.id?'selected':''}>${this.esc(g.name)}</option>`).join('')}</select><input type="text" class="form-control" id="chSrc" placeholder="🔍 Ara..." oninput="App.filterCh()" style="max-width:260px"></div><div class="toolbar-right" id="bBar" style="display:none"><span class="badge badge-primary" id="sCnt">0</span><button class="btn btn-danger btn-sm" onclick="App.delSel()">🗑️</button><button class="btn btn-secondary btn-sm" onclick="App.clrSel()">✕</button></div></div></div>`;if(!chs.length){h+=`<div class="empty-state fade-in"><div class="empty-icon">📺</div><h3>Kanal Yok</h3><button class="btn btn-primary" onclick="App.showChModal()">➕ Ekle</button></div>`}else{h+=`<div class="card fade-in"><div class="card-header"><h3>📺 Kanallar (${chs.length})</h3><label style="font-size:12px;cursor:pointer"><input type="checkbox" id="sAll" onchange="App.tAll(this)" style="accent-color:var(--primary)"> Tümü</label></div><div class="channel-list" id="cList">${chs.map(c=>this.rCh(c,gs)).join('')}</div></div>`}document.getElementById('content').innerHTML=h},
-    rCh(ch,gs){const gn=gs?.find(g=>g.id===ch.groupId)?.name||'';const logo=ch.logo?`<img class="ch-logo" src="${this.escA(ch.logo)}" onerror="this.outerHTML='<div class=\\'ch-logo-ph\\'>📺</div>'">`:`<div class="ch-logo-ph">📺</div>`;const sc=ch.status==='online'?'on':ch.status==='offline'?'off':ch.status==='checking'?'checking':'unknown';const st=ch.status==='online'?'Çevrimiçi':ch.status==='offline'?'Çevrimdışı':ch.status==='checking'?'Kontrol...':'—';return`<div class="channel-item ${ch.active?'':'inactive'}" data-id="${ch.id}" data-name="${this.escA(ch.name)}" data-url="${this.escA(ch.url)}" draggable="true" ondragstart="App.dS(event)" ondragover="App.dO(event)" ondrop="App.dDC(event)" ondragend="App.dE(event)"><input type="checkbox" class="ch-checkbox" value="${ch.id}" onchange="App.tSel(this)" ${this.selected.has(ch.id)?'checked':''}><span class="ch-drag">⠿</span><div class="ch-status ${sc}" id="st-${ch.id}"></div>${logo}<div class="ch-info"><div class="ch-name">${this.esc(ch.name)}</div><div class="ch-url">${this.esc(ch.url)}</div></div><span class="status-text ${sc}" id="sx-${ch.id}">${st}</span>${gn?`<span class="badge badge-primary">${this.esc(gn)}</span>`:''}<div class="ch-actions"><button class="btn btn-sm btn-outline btn-icon" onclick="App.preview(${ch.id})" title="Önizle">▶️</button><button class="btn btn-sm btn-outline btn-icon" onclick="Checker.checkSingle(${ch.id})" title="Kontrol">🩺</button><label class="toggle"><input type="checkbox" ${ch.active?'checked':''} onchange="DB.updateChannel(${ch.id},{active:this.checked})"><span class="toggle-sl"></span></label><button class="btn btn-sm btn-outline btn-icon" onclick="App.showChModal(${ch.id})">✏️</button><button class="btn btn-sm btn-danger btn-icon" onclick="if(confirm('Sil?')){DB.deleteChannel(${ch.id});App.toast('Silindi','success');App.pageCh()}">🗑️</button></div></div>`},
+
+    // YENİ renderChannel - iki satırlı layout
+    rCh(ch,gs){
+        const gn=gs?.find(g=>g.id===ch.groupId)?.name||'';
+        const logo=ch.logo?`<img class="ch-logo" src="${this.escA(ch.logo)}" onerror="this.outerHTML='<div class=\\'ch-logo-ph\\'>📺</div>'">`:`<div class="ch-logo-ph">📺</div>`;
+        const sc=ch.status==='online'?'on':ch.status==='offline'?'off':ch.status==='checking'?'checking':'unknown';
+        const st=ch.status==='online'?'Çevrimiçi':ch.status==='offline'?'Çevrimdışı':ch.status==='checking'?'Kontrol...':'—';
+
+        return`<div class="channel-item ${ch.active?'':'inactive'}" data-id="${ch.id}" data-name="${this.escA(ch.name)}" data-url="${this.escA(ch.url)}" draggable="true" ondragstart="App.dS(event)" ondragover="App.dO(event)" ondrop="App.dDC(event)" ondragend="App.dE(event)">
+            <div class="ch-top-row">
+                <input type="checkbox" class="ch-checkbox" value="${ch.id}" onchange="App.tSel(this)" ${this.selected.has(ch.id)?'checked':''}>
+                <span class="ch-drag">⠿</span>
+                <div class="ch-status ${sc}" id="st-${ch.id}"></div>
+                ${logo}
+                <div class="ch-info">
+                    <div class="ch-name">${this.esc(ch.name)}</div>
+                    <div class="ch-url">${this.esc(ch.url)}</div>
+                </div>
+            </div>
+            <div class="ch-bottom-row">
+                <span class="status-text ${sc}" id="sx-${ch.id}">${st}</span>
+                ${gn?`<span class="badge badge-primary">${this.esc(gn)}</span>`:''}
+                <div class="ch-actions-wrap">
+                    <button class="btn btn-sm btn-outline btn-icon" onclick="App.preview(${ch.id})" title="Önizle">▶️</button>
+                    <button class="btn btn-sm btn-outline btn-icon" onclick="Checker.checkSingle(${ch.id})" title="Kontrol">🩺</button>
+                    <label class="toggle"><input type="checkbox" ${ch.active?'checked':''} onchange="DB.updateChannel(${ch.id},{active:this.checked})"><span class="toggle-sl"></span></label>
+                    <button class="btn btn-sm btn-outline btn-icon" onclick="App.showChModal(${ch.id})">✏️</button>
+                    <button class="btn btn-sm btn-danger btn-icon" onclick="if(confirm('Sil?')){DB.deleteChannel(${ch.id});App.toast('Silindi','success');App.pageCh()}">🗑️</button>
+                </div>
+            </div>
+        </div>`;
+    },
+
     updateChSt(id,s){const e=document.getElementById('st-'+id),t=document.getElementById('sx-'+id);if(!e||!t)return;const c=s==='online'?'on':s==='offline'?'off':s==='checking'?'checking':'unknown';const x=s==='online'?'Çevrimiçi':s==='offline'?'Çevrimdışı':s==='checking'?'Kontrol...':'—';e.className='ch-status '+c;t.className='status-text '+c;t.textContent=x},
     filterCh(){const q=(document.getElementById('chSrc')?.value||'').toLowerCase();document.querySelectorAll('#cList .channel-item').forEach(e=>{const n=(e.dataset.name||'').toLowerCase(),u=(e.dataset.url||'').toLowerCase();e.style.display=(!q||n.includes(q)||u.includes(q))?'':'none'})},
-    showChModal(id=null){const ch=id?DB.data.channels.find(x=>x.id===id):null;const gs=DB.getGroups();if(!gs.length){this.toast('Önce grup oluşturun','warning');return this.navigate('groups')}this.openModal(`<div class="modal-header"><h3>${ch?'✏️ Düzenle':'➕ Yeni Kanal'}</h3><button class="modal-close" onclick="App.closeModal()">✕</button></div><div class="modal-body"><div class="form-group"><label>Grup</label><select id="mCG" class="form-control">${gs.map(g=>`<option value="${g.id}" ${ch?(ch.groupId===g.id?'selected':''):(this.currentGroupId==g.id?'selected':'')}>${this.esc(g.name)}</option>`).join('')}</select></div><div class="form-group"><label>Kanal Adı</label><input type="text" id="mCN" class="form-control" value="${ch?this.escA(ch.name):''}"></div><div class="form-group"><label>URL</label><input type="text" id="mCU" class="form-control" value="${ch?this.escA(ch.url):''}"></div><div class="form-group"><label>Logo URL</label><input type="text" id="mCL" class="form-control" value="${ch?this.escA(ch.logo||''):''}"></div><div class="form-group"><label>EPG ID</label><input type="text" id="mCE" class="form-control" value="${ch?this.escA(ch.epgId||''):''}"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="App.closeModal()">İptal</button><button class="btn btn-primary" onclick="App.saveCh(${id})">${ch?'💾':'➕'} ${ch?'Güncelle':'Ekle'}</button></div>`);document.getElementById('mCN').focus()},
+    showChModal(id=null){const ch=id?DB.data.channels.find(x=>x.id===id):null;const gs=DB.getGroups();if(!gs.length){this.toast('Önce grup oluşturun','warning');return this.navigate('groups')}this.openModal(`<div class="modal-header"><h3>${ch?'✏️ Düzenle':'➕ Yeni Kanal'}</h3><button class="modal-close" onclick="App.closeModal()">✕</button></div><div class="modal-body"><div class="form-group"><label>Grup</label><select id="mCG" class="form-control">${gs.map(g=>`<option value="${g.id}" ${ch?(ch.groupId===g.id?'selected':''):(this.currentGroupId==g.id?'selected':'')}>${this.esc(g.name)}</option>`).join('')}</select></div><div class="form-group"><label>Kanal Adı</label><input type="text" id="mCN" class="form-control" value="${ch?this.escA(ch.name):''}"></div><div class="form-group"><label>URL</label><input type="text" id="mCU" class="form-control" value="${ch?this.escA(ch.url):''}"></div><div class="form-group"><label>Logo URL</label><input type="text" id="mCL" class="form-control" value="${ch?this.escA(ch.logo||''):''}"></div><div class="form-group"><label>EPG ID</label><input type="text" id="mCE" class="form-control" value="${ch?this.escA(ch.epgId||''):''}"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="App.closeModal()">İptal</button><button class="btn btn-primary" onclick="App.saveCh(${id})">${ch?'💾 Güncelle':'➕ Ekle'}</button></div>`);document.getElementById('mCN').focus()},
     saveCh(id){const d={groupId:parseInt(document.getElementById('mCG').value),name:document.getElementById('mCN').value.trim(),url:document.getElementById('mCU').value.trim(),logo:document.getElementById('mCL').value.trim(),epgId:document.getElementById('mCE').value.trim()};if(!d.name)return this.toast('Ad gerekli','error');if(!d.url)return this.toast('URL gerekli','error');id?DB.updateChannel(id,d):DB.addChannel(d.groupId,d.name,d.url,d.logo,d.epgId);this.toast(id?'Güncellendi ✅':'Eklendi ✅','success');this.closeModal();this.pageCh()},
-    preview(id){const ch=DB.data.channels.find(x=>x.id===id);if(!ch)return;this.openModal(`<div class="modal-header"><h3>▶️ ${this.esc(ch.name)}</h3><button class="modal-close" onclick="App.closeModal()">✕</button></div><div class="modal-body"><div class="player-wrap"><video controls autoplay muted style="width:100%;height:100%"><source src="${this.escA(ch.url)}"></video></div><p style="margin-top:10px;font-size:12px;color:var(--text-muted)">URL: <code>${this.esc(ch.url)}</code></p></div>`)},
+    preview(id){const ch=DB.data.channels.find(x=>x.id===id);if(!ch)return;this.openModal(`<div class="modal-header"><h3>▶️ ${this.esc(ch.name)}</h3><button class="modal-close" onclick="App.closeModal()">✕</button></div><div class="modal-body"><div class="player-wrap"><video controls autoplay muted style="width:100%;height:100%"><source src="${this.escA(ch.url)}"></video></div><p style="margin-top:10px;font-size:12px;color:var(--text-muted);word-break:break-all">URL: <code>${this.esc(ch.url)}</code></p></div>`)},
 
-    // SELECTION
+    // SELECT
     tSel(cb){const id=parseInt(cb.value);cb.checked?this.selected.add(id):this.selected.delete(id);this.uB()},
     tAll(cb){document.querySelectorAll('.ch-checkbox').forEach(e=>{e.checked=cb.checked;cb.checked?this.selected.add(parseInt(e.value)):this.selected.delete(parseInt(e.value))});this.uB()},
     clrSel(){this.selected.clear();document.querySelectorAll('.ch-checkbox').forEach(e=>e.checked=false);const a=document.getElementById('sAll');if(a)a.checked=false;this.uB()},
@@ -414,226 +438,191 @@ const App={
     dDG(e){e.preventDefault();const t=e.target.closest('.group-item');if(!t||!this.dragEl||t===this.dragEl)return;const l=document.getElementById('gList'),items=[...l.children];items.indexOf(this.dragEl)<items.indexOf(t)?t.after(this.dragEl):t.before(this.dragEl);DB.reorderGroups([...l.children].map(e=>parseInt(e.dataset.id)));this.toast('Sıralama ✅','success')},
     dDC(e){e.preventDefault();const t=e.target.closest('.channel-item');if(!t||!this.dragEl||t===this.dragEl)return;const l=document.getElementById('cList'),items=[...l.children];items.indexOf(this.dragEl)<items.indexOf(t)?t.after(this.dragEl):t.before(this.dragEl);DB.reorderChannels([...l.children].map(e=>parseInt(e.dataset.id)));this.toast('Sıralama ✅','success')},
 
-    // CHECKER PAGE
-    pageCheck(){document.getElementById('topActions').innerHTML='';const gs=DB.getGroups(),s=DB.stats();document.getElementById('content').innerHTML=`<div class="card fade-in"><div class="card-header"><h3>🩺 Kanal Kontrolü</h3></div><p style="color:var(--text-muted);margin-bottom:16px;font-size:13px">Kanalların çalışıp çalışmadığını kontrol edin.</p><div class="form-group"><label>Kapsam</label><select id="ckScope" class="form-control" style="max-width:300px"><option value="">Tüm Kanallar (${s.channels})</option>${gs.map(g=>`<option value="${g.id}">${this.esc(g.name)} (${DB.data.channels.filter(x=>x.groupId===g.id).length})</option>`).join('')}</select></div><div style="display:flex;gap:10px"><button class="btn btn-primary" id="ckStart" onclick="App.startCk()">🩺 Başlat</button><button class="btn btn-danger" id="ckStop" onclick="Checker.stop();App.toast('Durduruldu','warning')" style="display:none">⏹️ Durdur</button></div><div id="ckProg" style="display:none;margin-top:18px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span id="ckTxt">Kontrol...</span><span id="ckPct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="ckFill" style="width:0%"></div></div></div></div><div id="ckRes">${this.existingRes()}</div>`},
-    existingRes(){const c=DB.data.channels,on=c.filter(x=>x.status==='online').length,off=c.filter(x=>x.status==='offline').length,unk=c.filter(x=>!x.status||x.status==='unknown').length;if(!on&&!off)return'';const offList=c.filter(x=>x.status==='offline'),gs=DB.getGroups();return`<div class="card fade-in"><div class="card-header"><h3>📊 Sonuçlar</h3></div><div class="check-summary"><div class="check-stat green"><div class="val">${on}</div><div class="lbl">🟢 Çevrimiçi</div></div><div class="check-stat red"><div class="val">${off}</div><div class="lbl">🔴 Çevrimdışı</div></div><div class="check-stat gray"><div class="val">${unk}</div><div class="lbl">⚪ Bilinmiyor</div></div></div>${offList.length?`<div class="card-header"><h3 style="color:var(--danger)">🔴 Çevrimdışı (${offList.length})</h3><button class="btn btn-danger btn-sm" onclick="App.delOff()">🗑️ Hepsini Sil</button></div><div class="channel-list">${offList.map(ch=>{const gn=gs.find(g=>g.id===ch.groupId)?.name||'';return`<div class="channel-item"><div class="ch-status off"></div><div class="ch-info"><div class="ch-name">${this.esc(ch.name)}</div><div class="ch-url">${this.esc(ch.url)}</div></div>${gn?`<span class="badge badge-primary">${this.esc(gn)}</span>`:''}<button class="btn btn-sm btn-outline btn-icon" onclick="Checker.checkSingle(${ch.id}).then(()=>App.pageCheck())">🔄</button><button class="btn btn-sm btn-danger btn-icon" onclick="DB.deleteChannel(${ch.id});App.pageCheck()">🗑️</button></div>`}).join('')}</div>`:''}</div>`},
-    async startCk(){const sc=document.getElementById('ckScope').value,gid=sc?parseInt(sc):null,chs=DB.getChannels(gid);if(!chs.length)return this.toast('Kanal yok','warning');document.getElementById('ckStart').style.display='none';document.getElementById('ckStop').style.display='';document.getElementById('ckProg').style.display='block';await Checker.checkAll(chs);document.getElementById('ckStart').style.display='';document.getElementById('ckStop').style.display='none'},
+    // CHECKER
+    pageCheck(){document.getElementById('topActions').innerHTML='';const gs=DB.getGroups(),s=DB.stats();document.getElementById('content').innerHTML=`<div class="card fade-in"><div class="card-header"><h3>🩺 Kanal Kontrolü</h3></div><div class="form-group"><label>Kapsam</label><select id="ckS" class="form-control" style="max-width:300px"><option value="">Tüm (${s.channels})</option>${gs.map(g=>`<option value="${g.id}">${this.esc(g.name)} (${DB.data.channels.filter(x=>x.groupId===g.id).length})</option>`).join('')}</select></div><div style="display:flex;gap:10px"><button class="btn btn-primary" id="ckStart" onclick="App.startCk()">🩺 Başlat</button><button class="btn btn-danger" id="ckStop" onclick="Checker.stop();App.toast('Durduruldu','warning')" style="display:none">⏹️ Durdur</button></div><div id="ckProg" style="display:none;margin-top:16px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span id="ckTxt"></span><span id="ckPct">0%</span></div><div class="progress-bar"><div class="progress-fill" id="ckFill" style="width:0%"></div></div></div></div><div id="ckRes">${this.existingRes()}</div>`},
+    existingRes(){const c=DB.data.channels,on=c.filter(x=>x.status==='online').length,off=c.filter(x=>x.status==='offline').length,unk=c.filter(x=>!x.status||x.status==='unknown').length;if(!on&&!off)return'';const offList=c.filter(x=>x.status==='offline'),gs=DB.getGroups();return`<div class="card fade-in"><div class="card-header"><h3>📊 Sonuçlar</h3></div><div class="check-summary"><div class="check-stat green"><div class="val">${on}</div><div class="lbl">🟢 Çevrimiçi</div></div><div class="check-stat red"><div class="val">${off}</div><div class="lbl">🔴 Çevrimdışı</div></div><div class="check-stat gray"><div class="val">${unk}</div><div class="lbl">⚪ Bilinmiyor</div></div></div>${offList.length?`<div class="card-header"><h3 style="color:var(--danger)">🔴 Çevrimdışı (${offList.length})</h3><button class="btn btn-danger btn-sm" onclick="App.delOff()">🗑️ Sil</button></div><div class="channel-list">${offList.map(ch=>{const gn=gs.find(g=>g.id===ch.groupId)?.name||'';return`<div class="channel-item" style="flex-wrap:nowrap"><div class="ch-status off"></div><div class="ch-info"><div class="ch-name">${this.esc(ch.name)}</div><div class="ch-url">${this.esc(ch.url)}</div></div>${gn?`<span class="badge badge-primary">${this.esc(gn)}</span>`:''}<button class="btn btn-sm btn-outline btn-icon" onclick="Checker.checkSingle(${ch.id}).then(()=>App.pageCheck())">🔄</button><button class="btn btn-sm btn-danger btn-icon" onclick="DB.deleteChannel(${ch.id});App.pageCheck()">🗑️</button></div>`}).join('')}</div>`:''}</div>`},
+    async startCk(){const sc=document.getElementById('ckS').value,gid=sc?parseInt(sc):null,chs=DB.getChannels(gid);if(!chs.length)return this.toast('Kanal yok','warning');document.getElementById('ckStart').style.display='none';document.getElementById('ckStop').style.display='';document.getElementById('ckProg').style.display='block';await Checker.checkAll(chs);document.getElementById('ckStart').style.display='';document.getElementById('ckStop').style.display='none'},
     updateProg(ck,tot,res){const p=tot?Math.round(ck/tot*100):0;const f=document.getElementById('ckFill'),t=document.getElementById('ckTxt'),pc=document.getElementById('ckPct');if(f)f.style.width=p+'%';if(t)t.textContent=`${ck}/${tot} (🟢${res.online} 🔴${res.offline})`;if(pc)pc.textContent=p+'%'},
     renderCheckRes(){const a=document.getElementById('ckRes');if(a)a.innerHTML=this.existingRes()},
-    delOff(){const off=DB.data.channels.filter(x=>x.status==='offline');if(!off.length)return;if(!confirm(`${off.length} çevrimdışı kanal silinecek?`))return;DB.deleteChannels(off.map(x=>x.id));this.toast(`${off.length} silindi 🗑️`,'success');this.pageCheck()},
+    delOff(){const off=DB.data.channels.filter(x=>x.status==='offline');if(!off.length)return;if(!confirm(`${off.length} çevrimdışı silinecek?`))return;DB.deleteChannels(off.map(x=>x.id));this.toast('Silindi 🗑️','success');this.pageCheck()},
 
-    // BULK REPLACE
+    // BULK
     pageBulk(){document.getElementById('topActions').innerHTML='';const gs=DB.getGroups();document.getElementById('content').innerHTML=`<div class="card fade-in"><div class="card-header"><h3>🔄 Toplu Link Değiştirme</h3></div><div class="form-group"><label>Kapsam</label><select id="brS" class="form-control"><option value="">Tüm Kanallar</option>${gs.map(g=>`<option value="${g.id}">${this.esc(g.name)}</option>`).join('')}</select></div><div class="form-group"><label>Aranan</label><input type="text" id="brF" class="form-control" placeholder="ör: http://eski:8080" oninput="App.prevR()"></div><div class="form-group"><label>Yeni</label><input type="text" id="brR" class="form-control" placeholder="ör: http://yeni:9090" oninput="App.prevR()"></div><div id="brP"></div><div style="margin-top:16px"><button class="btn btn-warning" onclick="App.execR()">🔄 Uygula</button></div></div>`},
-    prevR(){const s=document.getElementById('brF').value,r=document.getElementById('brR').value,p=document.getElementById('brP');if(!s||s.length<2){p.innerHTML='';return}const sc=document.getElementById('brS').value,gid=sc?parseInt(sc):null,ms=DB.getChannels(gid).filter(c=>c.url.includes(s));if(!ms.length){p.innerHTML='<div class="replace-preview"><p style="color:var(--text-muted);text-align:center">Eşleşen yok</p></div>';return}p.innerHTML=`<div class="replace-preview"><p style="margin-bottom:8px;font-weight:600;color:var(--warning)">⚠️ ${ms.length} kanal etkilenecek:</p>${ms.slice(0,10).map(c=>`<div class="rp-item"><strong>${this.esc(c.name)}</strong><br><div class="rp-old">- ${this.esc(c.url)}</div><div class="rp-new">+ ${this.esc(c.url.split(s).join(r))}</div></div>`).join('')}${ms.length>10?`<p style="color:var(--text-muted)">...+${ms.length-10} daha</p>`:''}</div>`},
+    prevR(){const s=document.getElementById('brF').value,r=document.getElementById('brR').value,p=document.getElementById('brP');if(!s||s.length<2){p.innerHTML='';return}const sc=document.getElementById('brS').value,gid=sc?parseInt(sc):null,ms=DB.getChannels(gid).filter(c=>c.url.includes(s));if(!ms.length){p.innerHTML='<div class="replace-preview"><p style="color:var(--text-muted);text-align:center">Eşleşen yok</p></div>';return}p.innerHTML=`<div class="replace-preview"><p style="margin-bottom:8px;font-weight:600;color:var(--warning)">⚠️ ${ms.length} kanal:</p>${ms.slice(0,10).map(c=>`<div class="rp-item"><strong>${this.esc(c.name)}</strong><br><div class="rp-old">- ${this.esc(c.url)}</div><div class="rp-new">+ ${this.esc(c.url.split(s).join(r))}</div></div>`).join('')}${ms.length>10?`<p style="color:var(--text-muted)">...+${ms.length-10}</p>`:''}</div>`},
     execR(){const s=document.getElementById('brF').value,r=document.getElementById('brR').value;if(!s)return this.toast('Aranan gerekli','error');const sc=document.getElementById('brS').value,c=DB.bulkReplace(s,r,sc?parseInt(sc):null);this.toast(`${c} güncellendi ✅`,'success');document.getElementById('brF').value=document.getElementById('brR').value='';document.getElementById('brP').innerHTML=''},
 
     // IMPORT
-    pageImport(){document.getElementById('topActions').innerHTML='';document.getElementById('content').innerHTML=`<div class="card fade-in"><div class="card-header"><h3>📥 M3U İçe Aktar</h3></div><div class="form-group"><label>M3U İçeriği</label><textarea id="impT" class="form-control" rows="14" placeholder="#EXTM3U..."></textarea></div><div class="form-group"><label>veya Dosya</label><input type="file" id="impF" accept=".m3u,.m3u8,.txt" class="form-control" onchange="App.hFile(this)"></div><button class="btn btn-success" onclick="App.execImp()">📥 İçe Aktar</button></div><div class="card fade-in"><div class="card-header"><h3>💾 JSON Yedekle/Yükle</h3></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-secondary" onclick="App.expJSON()">📥 JSON İndir</button><button class="btn btn-outline" onclick="document.getElementById('jFile').click()">📤 JSON Yükle</button><input type="file" id="jFile" accept=".json" style="display:none" onchange="App.impJSON(this)"></div></div>`},
+    pageImport(){document.getElementById('topActions').innerHTML='';document.getElementById('content').innerHTML=`<div class="card fade-in"><div class="card-header"><h3>📥 M3U İçe Aktar</h3></div><div class="form-group"><label>M3U İçeriği</label><textarea id="impT" class="form-control" rows="14" placeholder="#EXTM3U..."></textarea></div><div class="form-group"><label>veya Dosya</label><input type="file" accept=".m3u,.m3u8,.txt" class="form-control" onchange="App.hFile(this)"></div><button class="btn btn-success" onclick="App.execImp()">📥 İçe Aktar</button></div><div class="card fade-in"><div class="card-header"><h3>💾 JSON Yedek</h3></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-secondary" onclick="App.expJSON()">📥 İndir</button><button class="btn btn-outline" onclick="document.getElementById('jF').click()">📤 Yükle</button><input type="file" id="jF" accept=".json" style="display:none" onchange="App.impJSON(this)"></div></div>`},
     hFile(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=e=>document.getElementById('impT').value=e.target.result;r.readAsText(f)},
     execImp(){const c=document.getElementById('impT').value.trim();if(!c)return this.toast('İçerik gerekli','error');if(!c.includes('#EXTINF')&&!c.includes('#EXTM3U'))return this.toast('Geçerli M3U değil','error');const n=DB.importM3U(c);this.toast(`${n} kanal aktarıldı ✅`,'success');document.getElementById('impT').value=''},
-    expJSON(){const b=new Blob([DB.exportJSON()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`iptv_${new Date().toISOString().slice(0,10)}.json`;a.click();this.toast('İndirildi 💾','success')},
+    expJSON(){const b=new Blob([DB.exportJSON()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`iptv_${new Date().toISOString().slice(0,10)}.json`;a.click()},
     impJSON(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{if(DB.importJSON(e.target.result)){this.toast('Yüklendi ✅','success');this.navigate('dashboard')}else this.toast('Geçersiz','error')};r.readAsText(f)},
 
     // EXPORT
-    pageExport(){document.getElementById('topActions').innerHTML='';const m3u=DB.generateM3U(),ac=DB.data.channels.filter(c=>c.active).length;const bUrl=LinkServer.generate();document.getElementById('content').innerHTML=`<div class="card fade-in"><div class="card-header"><h3>📤 M3U Dışa Aktar</h3></div><div class="form-group"><label>Çıktı (${ac} aktif kanal)</label><textarea class="form-control" rows="10" readonly id="expT">${this.esc(m3u)}</textarea></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-primary" onclick="App.dlM3U()">💾 İndir</button><button class="btn btn-secondary" onclick="App.cpM3U()">📋 Kopyala</button></div></div><div class="card fade-in"><div class="card-header"><h3>🔗 Player Linkleri</h3></div><div class="form-group"><label>🐙 GitHub Raw URL (Kalıcı - Her Yerde Çalışır)</label><div class="link-box"><input type="text" readonly value="${GitHub.getRawUrl()}" id="ghLink"><button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText(document.getElementById('ghLink').value);App.toast('Kopyalandı','success')">📋</button></div><p style="font-size:11px;color:var(--text-muted);margin-top:4px">Bu linki VLC, TiviMate, Kodi vb. player'larda kullanın. GitHub'a sync edildikten sonra güncellenir.</p></div><div class="form-group"><label>📎 Blob URL (Bu Oturum İçin)</label><div class="link-box"><input type="text" readonly value="${bUrl}" id="bLink"><button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText(document.getElementById('bLink').value);App.toast('Kopyalandı','success')">📋</button></div></div><div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-github btn-sm" onclick="App.quickSync()">🐙 GitHub'a Gönder</button><button class="btn btn-warning btn-sm" onclick="App.refreshLinks()">🔄 Linkleri Yenile</button></div></div>`},
-    refreshLinks(){const b=LinkServer.generate();const i=document.getElementById('bLink');if(i)i.value=b;this.toast('Yenilendi 🔄','success')},
-    dlM3U(){const b=new Blob([DB.generateM3U()],{type:'application/x-mpegurl'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`playlist_${new Date().toISOString().slice(0,10)}.m3u`;a.click();this.toast('İndirildi 💾','success')},
+    pageExport(){document.getElementById('topActions').innerHTML='';const m3u=DB.generateM3U(),ac=DB.data.channels.filter(c=>c.active).length,bUrl=LinkServer.generate(),rawUrl=GitHub.getRawUrl();document.getElementById('content').innerHTML=`<div class="card fade-in"><div class="card-header"><h3>📤 M3U Dışa Aktar</h3></div><div class="form-group"><label>Çıktı (${ac} aktif kanal)</label><textarea class="form-control" rows="10" readonly id="expT">${this.esc(m3u)}</textarea></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-primary" onclick="App.dlM3U()">💾 İndir</button><button class="btn btn-secondary" onclick="App.cpM3U()">📋 Kopyala</button>${DB.data.github.token?`<button class="btn btn-github" onclick="App.quickSync()">🐙 GitHub'a Gönder</button>`:''}</div></div><div class="card fade-in"><div class="card-header"><h3>🔗 Player Linki</h3></div><div class="form-group"><label>🐙 GitHub Raw URL (Kalıcı)</label><div class="link-box"><input type="text" readonly value="${rawUrl}" id="ghL"><button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText(document.getElementById('ghL').value);App.toast('Kopyalandı','success')">📋</button></div></div></div>`},
+    dlM3U(){const b=new Blob([DB.generateM3U()],{type:'application/x-mpegurl'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`playlist_${new Date().toISOString().slice(0,10)}.m3u`;a.click()},
     cpM3U(){navigator.clipboard.writeText(document.getElementById('expT').value).then(()=>this.toast('Kopyalandı 📋','success'))},
 
-    // ==================== GITHUB SYNC PAGE ====================
+    // ==================== GITHUB - TOKEN BİR KEZ GİRİLSİN ====================
     pageGitHub(){
         document.getElementById('topActions').innerHTML='';
         const gh=DB.data.github;
-        const connected=!!gh.token;
+        const hasToken=!!gh.token;
         const rawUrl=GitHub.getRawUrl();
+
+        let tokenSection='';
+        if(hasToken){
+            tokenSection=`
+                <div class="token-saved">
+                    <span>🔐</span>
+                    <span class="ts-text">Token kayıtlı: <span class="token-mask">${GitHub.maskToken(gh.token)}</span></span>
+                    <button class="btn btn-sm btn-outline" onclick="App.showChangeToken()">Değiştir</button>
+                    <button class="btn btn-sm btn-danger" onclick="App.removeToken()">Sil</button>
+                </div>`;
+        }else{
+            tokenSection=`
+                <div class="form-group">
+                    <label>GitHub Personal Access Token</label>
+                    <input type="password" id="ghToken" class="form-control" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                    <p style="font-size:11px;color:var(--text-muted);margin-top:4px">
+                        <a href="https://github.com/settings/tokens/new?scopes=repo&description=IPTV+Manager" target="_blank" style="color:var(--secondary)">→ Token oluştur</a> (repo yetkisi gerekli)
+                    </p>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="App.saveToken()" style="margin-bottom:18px">💾 Token'ı Kaydet</button>`;
+        }
 
         document.getElementById('content').innerHTML=`
             <div class="card fade-in">
                 <div class="card-header">
                     <h3>🐙 GitHub Ayarları</h3>
-                    <span class="github-status ${connected?'connected':'disconnected'}">${connected?'● Bağlı':'○ Bağlı Değil'}</span>
+                    <span class="github-status ${hasToken?'connected':'disconnected'}">${hasToken?'● Bağlı':'○ Bağlı Değil'}</span>
                 </div>
-
-                <p style="color:var(--text-muted);margin-bottom:18px;font-size:13px">
-                    GitHub repository'nize M3U dosyasını otomatik olarak gönderin.<br>
-                    Böylece IPTV player'larınızda kalıcı bir link kullanabilirsiniz.
-                </p>
-
+                ${tokenSection}
                 <div class="form-group">
-                    <label>GitHub Personal Access Token</label>
-                    <input type="password" id="ghToken" class="form-control" 
-                           value="${this.escA(gh.token)}" 
-                           placeholder="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">
-                    <p style="font-size:11px;color:var(--text-muted);margin-top:4px">
-                        <a href="https://github.com/settings/tokens/new?scopes=repo&description=IPTV+Manager" target="_blank" style="color:var(--secondary)">
-                            → Token oluşturmak için tıklayın
-                        </a> (repo yetkisi gerekli)
-                    </p>
+                    <label>Repository Sahibi</label>
+                    <input type="text" id="ghOwner" class="form-control" value="${this.escA(gh.owner)}">
                 </div>
-
-                <div class="form-group">
-                    <label>Repository Sahibi (Owner)</label>
-                    <input type="text" id="ghOwner" class="form-control" value="${this.escA(gh.owner)}" placeholder="kullaniciadi">
-                </div>
-
                 <div class="form-group">
                     <label>Repository Adı</label>
-                    <input type="text" id="ghRepo" class="form-control" value="${this.escA(gh.repo)}" placeholder="repo-adi">
+                    <input type="text" id="ghRepo" class="form-control" value="${this.escA(gh.repo)}">
                 </div>
-
                 <div class="form-group">
                     <label>Dosya Yolu</label>
-                    <input type="text" id="ghPath" class="form-control" value="${this.escA(gh.path)}" placeholder="playlist.m3u">
+                    <input type="text" id="ghPath" class="form-control" value="${this.escA(gh.path)}">
                 </div>
-
                 <div class="form-group">
                     <label>Branch</label>
-                    <input type="text" id="ghBranch" class="form-control" value="${this.escA(gh.branch)}" placeholder="main">
+                    <input type="text" id="ghBranch" class="form-control" value="${this.escA(gh.branch)}">
                 </div>
-
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
-                    <button class="btn btn-primary" onclick="App.saveGH()">💾 Ayarları Kaydet</button>
-                    <button class="btn btn-outline" onclick="App.testGH()">🔍 Bağlantı Test Et</button>
-                </div>
-            </div>
-
-            <div class="card fade-in">
-                <div class="card-header">
-                    <h3>🚀 Sync İşlemleri</h3>
-                </div>
-
-                <div class="github-info">
-                    <div class="gi-row">
-                        <span class="gi-label">Raw URL (Player Linki)</span>
-                        <span class="gi-value">${rawUrl}</span>
-                    </div>
-                    <div class="gi-row">
-                        <span class="gi-label">Son Sync</span>
-                        <span class="gi-value">${gh.lastSync?new Date(gh.lastSync).toLocaleString('tr-TR'):'Henüz yapılmadı'}</span>
-                    </div>
-                    <div class="gi-row">
-                        <span class="gi-label">Aktif Kanal Sayısı</span>
-                        <span class="gi-value">${DB.data.channels.filter(c=>c.active).length}</span>
-                    </div>
-                </div>
-
-                <div class="link-box" style="margin:16px 0">
-                    <input type="text" readonly value="${rawUrl}" id="ghRawLink">
-                    <button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText(document.getElementById('ghRawLink').value);App.toast('Link kopyalandı!','success')">📋</button>
-                    <a href="${rawUrl}" target="_blank" class="btn btn-sm btn-outline">🔗</a>
-                </div>
-
                 <div style="display:flex;gap:10px;flex-wrap:wrap">
-                    <button class="btn btn-success" onclick="App.syncGH()" ${!connected?'disabled':''}>
-                        🚀 Şimdi GitHub'a Gönder
-                    </button>
-                    <button class="btn btn-outline" onclick="App.pullGH()" ${!connected?'disabled':''}>
-                        📥 GitHub'dan Çek
-                    </button>
+                    <button class="btn btn-primary" onclick="App.saveGH()">💾 Kaydet</button>
+                    <button class="btn btn-outline" onclick="App.testGH()" ${!hasToken?'disabled':''}>🔍 Test Et</button>
                 </div>
-
-                <div class="sync-log" id="syncLog" style="margin-top:16px;display:none"></div>
             </div>
 
             <div class="card fade-in">
-                <div class="card-header"><h3>📱 Player Kullanım Rehberi</h3></div>
+                <div class="card-header"><h3>🚀 Sync</h3></div>
+                <div class="github-info">
+                    <div class="gi-row"><span class="gi-label">Raw URL</span><span class="gi-value">${rawUrl}</span></div>
+                    <div class="gi-row"><span class="gi-label">Son Sync</span><span class="gi-value">${gh.lastSync?new Date(gh.lastSync).toLocaleString('tr-TR'):'—'}</span></div>
+                    <div class="gi-row"><span class="gi-label">Aktif Kanal</span><span class="gi-value">${DB.data.channels.filter(c=>c.active).length}</span></div>
+                </div>
+                <div class="link-box"><input type="text" readonly value="${rawUrl}" id="ghRL"><button class="btn btn-sm btn-outline" onclick="navigator.clipboard.writeText(document.getElementById('ghRL').value);App.toast('Kopyalandı','success')">📋</button></div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+                    <button class="btn btn-success" onclick="App.syncGH()" ${!hasToken?'disabled':''}>🚀 GitHub'a Gönder</button>
+                    <button class="btn btn-outline" onclick="App.pullGH()" ${!hasToken?'disabled':''}>📥 GitHub'dan Çek</button>
+                </div>
+                <div class="sync-log" id="syncLog" style="display:none"></div>
+            </div>
+
+            <div class="card fade-in">
+                <div class="card-header"><h3>📱 Player Rehberi</h3></div>
                 <div style="font-size:13px;color:var(--text-muted);line-height:1.9">
-                    <p><strong>🔗 M3U Link:</strong></p>
-                    <code style="font-size:12px;word-break:break-all;display:block;padding:10px;background:var(--dark);border-radius:6px;margin:6px 0">${rawUrl}</code>
-                    
-                    <p style="margin-top:14px"><strong>🎬 VLC:</strong> Medya → Ağ Akışı Aç → Yukarıdaki URL</p>
-                    <p><strong>📱 TiviMate:</strong> Playlist ekle → M3U URL → Yukarıdaki URL</p>
-                    <p><strong>📺 IPTV Smarters:</strong> Add User → M3U URL → Yukarıdaki URL</p>
-                    <p><strong>💻 Kodi:</strong> PVR IPTV Simple Client → M3U URL</p>
-                    <p><strong>📱 OTT Navigator:</strong> Providers → Add → URL olarak yapıştırın</p>
-                    
-                    <p style="margin-top:14px;color:var(--warning)">⚡ Her "GitHub'a Gönder" yaptığınızda link otomatik güncellenir!</p>
+                    <code style="display:block;padding:10px;background:var(--dark);border-radius:6px;margin:6px 0;word-break:break-all;font-size:12px">${rawUrl}</code>
+                    <p><strong>🎬 VLC:</strong> Medya → Ağ Akışı Aç</p>
+                    <p><strong>📱 TiviMate:</strong> Playlist ekle → M3U URL</p>
+                    <p><strong>📺 IPTV Smarters:</strong> M3U URL</p>
+                    <p><strong>💻 Kodi:</strong> PVR IPTV Simple Client</p>
+                    <p style="color:var(--warning);margin-top:8px">⚡ "GitHub'a Gönder" yaptığınızda link güncellenir</p>
                 </div>
             </div>`;
     },
 
+    saveToken(){
+        const t=document.getElementById('ghToken').value.trim();
+        if(!t)return this.toast('Token gerekli','error');
+        if(!t.startsWith('ghp_')&&!t.startsWith('github_pat_'))this.toast('Token formatı hatalı olabilir','warning');
+        DB.data.github.token=t;
+        DB.save();
+        this.toast('Token kaydedildi ✅','success');
+        this.pageGitHub();
+    },
+
+    showChangeToken(){
+        this.openModal(`<div class="modal-header"><h3>🔐 Token Değiştir</h3><button class="modal-close" onclick="App.closeModal()">✕</button></div>
+        <div class="modal-body">
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Mevcut: <span class="token-mask">${GitHub.maskToken(DB.data.github.token)}</span></p>
+            <div class="form-group"><label>Yeni Token</label><input type="password" id="newGhToken" class="form-control" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" onclick="App.closeModal()">İptal</button><button class="btn btn-primary" onclick="App.updateToken()">💾 Kaydet</button></div>`);
+    },
+
+    updateToken(){
+        const t=document.getElementById('newGhToken').value.trim();
+        if(!t)return this.toast('Token gerekli','error');
+        DB.data.github.token=t;
+        DB.save();
+        this.toast('Token güncellendi ✅','success');
+        this.closeModal();
+        this.pageGitHub();
+    },
+
+    removeToken(){
+        if(!confirm('Token silinecek. Emin misiniz?'))return;
+        DB.data.github.token='';
+        DB.save();
+        this.toast('Token silindi','success');
+        this.pageGitHub();
+    },
+
     saveGH(){
-        DB.data.github.token=document.getElementById('ghToken').value.trim();
         DB.data.github.owner=document.getElementById('ghOwner').value.trim();
         DB.data.github.repo=document.getElementById('ghRepo').value.trim();
         DB.data.github.path=document.getElementById('ghPath').value.trim();
         DB.data.github.branch=document.getElementById('ghBranch').value.trim()||'main';
         DB.save();
-        this.toast('GitHub ayarları kaydedildi ✅','success');
-        this.pageGitHub();
+        this.toast('Ayarlar kaydedildi ✅','success');
     },
 
     async testGH(){
-        this.saveGH();
-        const log=document.getElementById('syncLog');
-        log.style.display='block';
-        log.innerHTML='<span class="log-info">🔍 Bağlantı test ediliyor...</span>';
-        try{
-            const info=await GitHub.testConnection();
-            log.innerHTML=`<span class="log-ok">✅ Bağlantı başarılı!</span><br>
-                <span class="log-info">📦 Repo: ${info.full_name}</span><br>
-                <span class="log-info">🔒 Private: ${info.private?'Evet':'Hayır'}</span><br>
-                <span class="log-info">⭐ Stars: ${info.stargazers_count}</span>`;
-        }catch(e){
-            log.innerHTML=`<span class="log-err">❌ Hata: ${App.esc(e.message)}</span><br>
-                <span class="log-info">Token'ın "repo" yetkisine sahip olduğundan emin olun.</span>`;
-        }
-    },
+        const log=document.getElementById('syncLog');log.style.display='block';
+        log.innerHTML='<span class="log-info">🔍 Test ediliyor...</span>';
+        try{const info=await GitHub.testConnection();
+        log.innerHTML=`<span class="log-ok">✅ Bağlantı başarılı!</span><br><span class="log-info">📦 ${info.full_name}</span><br><span class="log-info">🔒 Private: ${info.private?'Evet':'Hayır'}</span>`}
+        catch(e){log.innerHTML=`<span class="log-err">❌ ${this.esc(e.message)}</span>`}},
 
     async syncGH(){
-        const log=document.getElementById('syncLog');
-        log.style.display='block';
-        log.innerHTML='<span class="log-info">🚀 GitHub\'a gönderiliyor...</span>';
-        
-        try{
-            const m3u=DB.generateM3U();
-            const stats=DB.stats();
-            log.innerHTML+='<br><span class="log-info">📊 '+stats.active+' aktif kanal hazırlandı</span>';
-            
-            await GitHub.syncNow();
-            
-            log.innerHTML+=`<br><span class="log-ok">✅ Başarıyla gönderildi!</span>
-                <br><span class="log-info">🔗 ${GitHub.getRawUrl()}</span>
-                <br><span class="log-info">⏰ ${new Date().toLocaleString('tr-TR')}</span>`;
-            
-            this.toast('GitHub\'a gönderildi! ✅','success');
-        }catch(e){
-            log.innerHTML+=`<br><span class="log-err">❌ Hata: ${this.esc(e.message)}</span>`;
-            this.toast('GitHub hatası: '+e.message,'error');
-        }
-    },
+        const log=document.getElementById('syncLog');log.style.display='block';
+        log.innerHTML='<span class="log-info">🚀 Gönderiliyor...</span>';
+        try{await GitHub.syncNow();
+        log.innerHTML+=`<br><span class="log-ok">✅ Başarıyla gönderildi!</span><br><span class="log-info">⏰ ${new Date().toLocaleString('tr-TR')}</span>`;
+        this.toast('Gönderildi! ✅','success')}
+        catch(e){log.innerHTML+=`<br><span class="log-err">❌ ${this.esc(e.message)}</span>`;this.toast('Hata: '+e.message,'error')}},
 
     async pullGH(){
-        const log=document.getElementById('syncLog');
-        log.style.display='block';
-        log.innerHTML='<span class="log-info">📥 GitHub\'dan çekiliyor...</span>';
-        
-        try{
-            const file=await GitHub.getFile();
-            if(!file.exists){
-                log.innerHTML+='<br><span class="log-err">❌ Dosya bulunamadı</span>';
-                return;
-            }
-            
-            const content=file.content;
-            const count=DB.importM3U(content);
-            
-            log.innerHTML+=`<br><span class="log-ok">✅ ${count} kanal içe aktarıldı!</span>`;
-            this.toast(`GitHub'dan ${count} kanal çekildi ✅`,'success');
-        }catch(e){
-            log.innerHTML+=`<br><span class="log-err">❌ Hata: ${this.esc(e.message)}</span>`;
-            this.toast('Hata: '+e.message,'error');
-        }
-    },
+        const log=document.getElementById('syncLog');log.style.display='block';
+        log.innerHTML='<span class="log-info">📥 Çekiliyor...</span>';
+        try{const f=await GitHub.getFile();if(!f.exists){log.innerHTML+='<br><span class="log-err">❌ Dosya yok</span>';return}
+        const c=DB.importM3U(f.content);log.innerHTML+=`<br><span class="log-ok">✅ ${c} kanal aktarıldı</span>`;this.toast(`${c} kanal çekildi ✅`,'success')}
+        catch(e){log.innerHTML+=`<br><span class="log-err">❌ ${this.esc(e.message)}</span>`}},
 
     // SETTINGS
     pageSettings(){document.getElementById('topActions').innerHTML='';document.getElementById('content').innerHTML=`<div class="card fade-in"><div class="card-header"><h3>🔐 Şifre Değiştir</h3></div><div class="form-group"><label>Mevcut</label><input type="password" id="sC" class="form-control"></div><div class="form-group"><label>Yeni</label><input type="password" id="sN" class="form-control"></div><div class="form-group"><label>Tekrar</label><input type="password" id="sN2" class="form-control"></div><button class="btn btn-primary" onclick="App.chgP()">🔐 Güncelle</button></div><div class="card fade-in"><div class="card-header"><h3>👤 Kullanıcı Adı</h3></div><div class="form-group"><label>Yeni</label><input type="text" id="sU" class="form-control"></div><div class="form-group"><label>Şifre</label><input type="password" id="sUP" class="form-control"></div><button class="btn btn-primary" onclick="App.chgU()">👤 Güncelle</button></div><div class="card fade-in"><div class="card-header"><h3>🗑️ Sıfırla</h3></div><button class="btn btn-danger" onclick="App.resetAll()">⚠️ Tüm Verileri Sil</button></div>`},
-    chgP(){const c=document.getElementById('sC').value,n=document.getElementById('sN').value,n2=document.getElementById('sN2').value;if(!c||!n)return this.toast('Doldurun','error');if(n.length<4)return this.toast('Min 4 karakter','error');if(n!==n2)return this.toast('Eşleşmiyor','error');if(DB.changePassword(c,n)){this.toast('Güncellendi ✅','success');document.getElementById('sC').value=document.getElementById('sN').value=document.getElementById('sN2').value=''}else this.toast('Yanlış şifre','error')},
-    chgU(){const u=document.getElementById('sU').value.trim(),p=document.getElementById('sUP').value;if(!u||!p)return this.toast('Doldurun','error');if(DB.changeUsername(u,p))this.toast('Güncellendi ✅','success');else this.toast('Yanlış şifre','error')},
-    resetAll(){this.openModal(`<div class="modal-header"><h3>⚠️ Sıfırla</h3><button class="modal-close" onclick="App.closeModal()">✕</button></div><div class="modal-body"><p style="color:var(--danger)">Tüm veriler silinecek!</p><div class="form-group" style="margin-top:14px"><label>Şifre</label><input type="password" id="rP" class="form-control"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="App.closeModal()">İptal</button><button class="btn btn-danger" onclick="App.confReset()">🗑️</button></div>`)},
+    chgP(){const c=document.getElementById('sC').value,n=document.getElementById('sN').value,n2=document.getElementById('sN2').value;if(!c||!n)return this.toast('Doldurun','error');if(n.length<4)return this.toast('Min 4','error');if(n!==n2)return this.toast('Eşleşmiyor','error');if(DB.changePassword(c,n)){this.toast('Güncellendi ✅','success');document.getElementById('sC').value=document.getElementById('sN').value=document.getElementById('sN2').value=''}else this.toast('Yanlış','error')},
+    chgU(){const u=document.getElementById('sU').value.trim(),p=document.getElementById('sUP').value;if(!u||!p)return this.toast('Doldurun','error');if(DB.changeUsername(u,p))this.toast('Güncellendi ✅','success');else this.toast('Yanlış','error')},
+    resetAll(){this.openModal(`<div class="modal-header"><h3>⚠️</h3><button class="modal-close" onclick="App.closeModal()">✕</button></div><div class="modal-body"><p style="color:var(--danger)">Tüm veriler silinecek!</p><div class="form-group" style="margin-top:14px"><label>Şifre</label><input type="password" id="rP" class="form-control"></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="App.closeModal()">İptal</button><button class="btn btn-danger" onclick="App.confReset()">🗑️</button></div>`)},
     confReset(){if(document.getElementById('rP').value!==DB.data.config.password)return this.toast('Yanlış','error');const c={...DB.data.config};DB._d=DB.def();DB._d.config=c;DB.save();this.closeModal();this.toast('Sıfırlandı','success');this.navigate('dashboard')},
 
-    // MODAL / TOAST / HELPERS
     openModal(h){document.getElementById('modalBox').innerHTML=h;document.getElementById('modalOverlay').classList.add('active')},
     closeModal(){document.getElementById('modalOverlay').classList.remove('active')},
     toast(m,t='info'){const ic={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};const e=document.createElement('div');e.className=`toast ${t}`;e.innerHTML=`<span>${ic[t]||''}</span> ${this.esc(m)}`;document.getElementById('toastBox').appendChild(e);setTimeout(()=>{e.style.opacity='0';e.style.transform='translateX(100%)';e.style.transition='0.3s';setTimeout(()=>e.remove(),300)},3500)},
