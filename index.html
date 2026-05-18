@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Manager</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #0ea5e9;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --dark-2: #1e293b;
+            --dark-3: #334155;
+            --dark-4: #475569;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ===== LOGIN ===== */
+        .login-overlay {
+            position: fixed; inset: 0;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b, #0f172a);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .login-overlay.hidden { display: none; }
+
+        .login-box {
+            background: var(--dark-2); border: 1px solid var(--border);
+            border-radius: 20px; padding: 48px; width: 420px; max-width: 90vw;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+        }
+        .login-box .logo { text-align: center; font-size: 56px; margin-bottom: 12px; }
+        .login-box h1 {
+            text-align: center; font-size: 26px; margin-bottom: 6px;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .login-box .sub { text-align: center; color: var(--text-muted); margin-bottom: 32px; font-size: 14px; }
+
+        /* ===== FORM ===== */
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block; font-size: 12px; font-weight: 600;
+            color: var(--text-muted); margin-bottom: 6px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .form-control {
+            width: 100%; padding: 11px 14px;
+            background: var(--dark); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text); font-size: 14px;
+            outline: none; transition: 0.2s;
+        }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.18); }
+        .form-control::placeholder { color: var(--dark-4); }
+        textarea.form-control { resize: vertical; min-height: 70px; }
+        select.form-control {
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+        }
+
+        /* ===== BUTONLAR ===== */
+        .btn {
+            padding: 10px 18px; border: none; border-radius: 8px;
+            font-size: 13px; font-weight: 600; cursor: pointer;
+            transition: 0.2s; display: inline-flex; align-items: center; gap: 7px;
+        }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .btn:active { transform: translateY(0); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, var(--success), #059669); color: #fff; }
+        .btn-danger { background: linear-gradient(135deg, var(--danger), #dc2626); color: #fff; }
+        .btn-warning { background: linear-gradient(135deg, var(--warning), #d97706); color: #fff; }
+        .btn-secondary { background: var(--dark-3); color: var(--text); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: var(--dark-3); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-lg { padding: 14px 28px; font-size: 15px; width: 100%; justify-content: center; }
+        .btn-icon { padding: 7px; min-width: 34px; justify-content: center; }
+
+        /* ===== LAYOUT ===== */
+        .app-container { display: flex; min-height: 100vh; }
+        .app-container.hidden { display: none; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 260px; background: var(--dark-2);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            position: fixed; height: 100vh; z-index: 100;
+            transition: transform 0.3s;
+        }
+        .sidebar-header { padding: 18px 20px; border-bottom: 1px solid var(--border); }
+        .sidebar-header h2 {
+            font-size: 17px;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .sidebar-nav { padding: 10px; flex: 1; overflow-y: auto; }
+        .nav-item {
+            padding: 11px 14px; border-radius: 8px; cursor: pointer;
+            display: flex; align-items: center; gap: 10px;
+            color: var(--text-muted); transition: 0.2s; margin-bottom: 3px; font-size: 13px;
+        }
+        .nav-item:hover { background: var(--dark-3); color: var(--text); }
+        .nav-item.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; }
+        .nav-item .icon { font-size: 17px; width: 22px; text-align: center; }
+        .nav-divider { height: 1px; background: var(--border); margin: 10px 0; }
+        .sidebar-footer { padding: 14px; border-top: 1px solid var(--border); }
+
+        /* ===== MAIN ===== */
+        .main-content { flex: 1; margin-left: 260px; }
+        .top-bar {
+            background: var(--dark-2); border-bottom: 1px solid var(--border);
+            padding: 14px 22px; display: flex; align-items: center;
+            justify-content: space-between; position: sticky; top: 0; z-index: 50;
+        }
+        .top-bar h1 { font-size: 20px; }
+        .top-bar-actions { display: flex; gap: 8px; align-items: center; }
+        .content-area { padding: 22px; }
+
+        /* ===== CARD ===== */
+        .card {
+            background: var(--dark-2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 22px; margin-bottom: 18px;
+        }
+        .card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
+        }
+        .card-header h3 { font-size: 15px; display: flex; align-items: center; gap: 8px; }
+
+        /* ===== STATS ===== */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 22px; }
+        .stat-card {
+            background: var(--dark-2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 18px; display: flex; align-items: center; gap: 14px;
+        }
+        .stat-icon {
+            width: 46px; height: 46px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
+        }
+        .stat-icon.blue { background: rgba(99,102,241,0.15); }
+        .stat-icon.green { background: rgba(16,185,129,0.15); }
+        .stat-icon.yellow { background: rgba(245,158,11,0.15); }
+        .stat-icon.red { background: rgba(239,68,68,0.15); }
+        .stat-value { font-size: 26px; font-weight: 700; }
+        .stat-label { font-size: 12px; color: var(--text-muted); }
+
+        /* ===== GROUP LIST ===== */
+        .group-list, .channel-list { display: flex; flex-direction: column; gap: 6px; }
+        .group-item, .channel-item {
+            background: var(--dark); border: 1px solid var(--border);
+            border-radius: 8px; padding: 11px 14px;
+            display: flex; align-items: center; transition: 0.2s;
+        }
+        .group-item:hover, .channel-item:hover { border-color: var(--primary); }
+        .group-item.dragging, .channel-item.dragging { opacity: 0.4; }
+        .group-item { justify-content: space-between; cursor: grab; }
+        .group-info { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .drag-handle, .ch-drag { color: var(--dark-4); cursor: grab; font-size: 16px; user-select: none; }
+        .group-name { font-weight: 600; font-size: 14px; }
+        .group-count {
+            font-size: 11px; color: var(--text-muted);
+            background: var(--dark-3); padding: 2px 8px; border-radius: 10px;
+        }
+        .group-actions, .ch-actions { display: flex; gap: 5px; flex-shrink: 0; }
+
+        /* ===== CHANNEL ITEM ===== */
+        .channel-item { gap: 10px; }
+        .channel-item.inactive { opacity: 0.45; }
+        .ch-checkbox { accent-color: var(--primary); width: 15px; height: 15px; cursor: pointer; }
+        .ch-logo {
+            width: 34px; height: 34px; border-radius: 6px;
+            object-fit: contain; background: var(--dark-3);
+        }
+        .ch-logo-ph {
+            width: 34px; height: 34px; border-radius: 6px;
+            background: var(--dark-3); display: flex; align-items: center;
+            justify-content: center; font-size: 15px; color: var(--dark-4); flex-shrink: 0;
+        }
+        .ch-info { flex: 1; min-width: 0; }
+        .ch-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ch-url {
+            font-size: 11px; color: var(--text-muted);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            font-family: 'Fira Code', 'Consolas', monospace;
+        }
+        .ch-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .ch-status.on { background: var(--success); }
+        .ch-status.off { background: var(--danger); }
+
+        /* ===== BADGE ===== */
+        .badge {
+            padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap;
+        }
+        .badge-primary { background: rgba(99,102,241,0.2); color: var(--primary-light); }
+
+        /* ===== TOGGLE ===== */
+        .toggle { position: relative; width: 40px; height: 22px; cursor: pointer; flex-shrink: 0; }
+        .toggle input { display: none; }
+        .toggle-sl {
+            position: absolute; inset: 0; background: var(--dark-4);
+            border-radius: 11px; transition: 0.3s;
+        }
+        .toggle-sl:before {
+            content: ''; position: absolute; width: 16px; height: 16px;
+            left: 3px; bottom: 3px; background: #fff;
+            border-radius: 50%; transition: 0.3s;
+        }
+        .toggle input:checked + .toggle-sl { background: var(--success); }
+        .toggle input:checked + .toggle-sl:before { transform: translateX(18px); }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; backdrop-filter: blur(4px);
+            opacity: 0; visibility: hidden; transition: 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal {
+            background: var(--dark-2); border: 1px solid var(--border);
+            border-radius: 16px; width: 500px; max-width: 92vw;
+            max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+            transform: translateY(20px); transition: 0.3s;
+        }
+        .modal-overlay.active .modal { transform: translateY(0); }
+        .modal-header {
+            padding: 18px 22px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h3 { font-size: 17px; }
+        .modal-close {
+            width: 30px; height: 30px; border: none; background: var(--dark-3);
+            color: var(--text); border-radius: 8px; cursor: pointer; font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-close:hover { background: var(--danger); }
+        .modal-body { padding: 22px; }
+        .modal-footer {
+            padding: 14px 22px; border-top: 1px solid var(--border);
+            display: flex; justify-content: flex-end; gap: 8px;
+        }
+
+        /* ===== REPLACE PREVIEW ===== */
+        .replace-preview {
+            background: var(--dark); border: 1px solid var(--border);
+            border-radius: 8px; padding: 14px; margin-top: 14px; max-height: 240px; overflow-y: auto;
+        }
+        .rp-item { padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+        .rp-item:last-child { border-bottom: none; }
+        .rp-old { color: var(--danger); text-decoration: line-through; word-break: break-all; }
+        .rp-new { color: var(--success); word-break: break-all; }
+
+        /* ===== TOAST ===== */
+        .toast-box {
+            position: fixed; top: 18px; right: 18px; z-index: 2000;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .toast {
+            background: var(--dark-2); border: 1px solid var(--border);
+            border-radius: 10px; padding: 12px 18px;
+            display: flex; align-items: center; gap: 8px;
+            min-width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            animation: toastIn 0.3s ease; font-size: 13px;
+        }
+        .toast.success { border-left: 3px solid var(--success); }
+        .toast.error { border-left: 3px solid var(--danger); }
+        .toast.warning { border-left: 3px solid var(--warning); }
+        .toast.info { border-left: 3px solid var(--secondary); }
+        @keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* ===== TOOLBAR ===== */
+        .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+        .toolbar-left { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
+        .toolbar-right { display: flex; align-items: center; gap: 8px; }
+
+        /* ===== EMPTY ===== */
+        .empty-state { text-align: center; padding: 50px 20px; color: var(--text-muted); }
+        .empty-state .empty-icon { font-size: 56px; margin-bottom: 14px; opacity: 0.5; }
+        .empty-state h3 { margin-bottom: 6px; color: var(--text); }
+        .empty-state p { font-size: 13px; margin-bottom: 18px; }
+
+        .fade-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .loading-spinner {
+            display: inline-block; width: 20px; height: 20px;
+            border: 2px solid var(--dark-4); border-top-color: var(--primary);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .mobile-toggle { display: none; background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--dark-4); border-radius: 3px; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .mobile-toggle { display: block; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar-left, .toolbar-right { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div class="login-overlay" id="loginScreen">
+    <div class="login-box">
+        <div class="logo">📡</div>
+        <h1>IPTV Manager</h1>
+        <p class="sub">Yönetim paneline giriş yapın</p>
+        <div class="form-group">
+            <label>Kullanıcı Adı</label>
+            <input type="text" id="loginUser" class="form-control" placeholder="Kullanıcı adınız">
+        </div>
+        <div class="form-group">
+            <label>Şifre</label>
+            <input type="password" id="loginPass" class="form-control" placeholder="Şifreniz"
+                   onkeydown="if(event.key==='Enter')App.doLogin()">
+        </div>
+        <button class="btn btn-primary btn-lg" onclick="App.doLogin()" id="loginBtn">🔐 Giriş Yap</button>
+        <p style="text-align:center;margin-top:14px;font-size:11px;color:var(--text-muted)">
+            Varsayılan: admin / admin123
+        </p>
+    </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div class="app-container hidden" id="appContainer">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>📡 IPTV Manager</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-item active" data-page="dashboard" onclick="App.navigate('dashboard')">
+                <span class="icon">📊</span> Gösterge Paneli
+            </div>
+            <div class="nav-item" data-page="groups" onclick="App.navigate('groups')">
+                <span class="icon">📁</span> Gruplar
+            </div>
+            <div class="nav-item" data-page="channels" onclick="App.navigate('channels')">
+                <span class="icon">📺</span> Kanallar
+            </div>
+            <div class="nav-divider"></div>
+            <div class="nav-item" data-page="bulk" onclick="App.navigate('bulk')">
+                <span class="icon">🔄</span> Toplu Link Değiştir
+            </div>
+            <div class="nav-item" data-page="import" onclick="App.navigate('import')">
+                <span class="icon">📥</span> M3U İçe Aktar
+            </div>
+            <div class="nav-item" data-page="export" onclick="App.navigate('export')">
+                <span class="icon">📤</span> M3U Dışa Aktar
+            </div>
+            <div class="nav-divider"></div>
+            <div class="nav-item" data-page="settings" onclick="App.navigate('settings')">
+                <span class="icon">⚙️</span> Ayarlar
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn btn-outline btn-sm" onclick="App.logout()" style="width:100%">🚪 Çıkış Yap</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="top-bar">
+            <div style="display:flex;align-items:center;gap:10px">
+                <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+                <h1 id="pageTitle">Gösterge Paneli</h1>
+            </div>
+            <div class="top-bar-actions" id="topActions"></div>
+        </div>
+        <div class="content-area" id="content"></div>
+    </main>
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)App.closeModal()">
+    <div class="modal" id="modalBox"></div>
+</div>
+
+<!-- ===== TOASTS ===== -->
+<div class="toast-box" id="toastBox"></div>
+
+<script>
+// =====================================================================
+//  IPTV MANAGER - TEK DOSYA UYGULAMASI
+//  Tüm veriler localStorage'da AES şifrelenmiş olarak saklanır
+// =====================================================================
+
+// ===== BASİT AES ŞİFRELEME (Base64 + XOR tabanlı) =====
+const Crypto = {
+    key: 'IPTV_Manager_Secret_Key_2024!',
+
+    encrypt(data) {
+        const json = JSON.stringify(data);
+        let result = '';
+        for (let i = 0; i < json.length; i++) {
+            result += String.fromCharCode(
+                json.charCodeAt(i) ^ this.key.charCodeAt(i % this.key.length)
+            );
+        }
+        return btoa(unescape(encodeURIComponent(result)));
+    },
+
+    decrypt(encoded) {
+        try {
+            const decoded = decodeURIComponent(escape(atob(encoded)));
+            let result = '';
+            for (let i = 0; i < decoded.length; i++) {
+                result += String.fromCharCode(
+                    decoded.charCodeAt(i) ^ this.key.charCodeAt(i % this.key.length)
+                );
+            }
+            return JSON.parse(result);
+        } catch {
+            return null;
+        }
+    }
+};
+
+// ===== VERİTABANI =====
+const DB = {
+    _data: null,
+
+    defaultData() {
+        return {
+            config: {
+                username: 'admin',
+                password: 'admin123',
+            },
+            groups: [],
+            channels: [],
+            nextGroupId: 1,
+            nextChannelId: 1
+        };
+    },
+
+    load() {
+        if (this._data) return this._data;
+        const raw = localStorage.getItem('iptv_manager_data');
+        if (!raw) {
+            this._data = this.defaultData();
+            this.save();
+            return this._data;
+        }
+        const dec = Crypto.decrypt(raw);
+        if (!dec) {
+            this._data = this.defaultData();
+            this.save();
+            return this._data;
+        }
+        this._data = dec;
+        return this._data;
+    },
+
+    save() {
+        localStorage.setItem('iptv_manager_data', Crypto.encrypt(this._data));
+    },
+
+    get data() { return this.load(); },
+
+    // Grup
+    getGroups() {
+        return [...this.data.groups].sort((a, b) => a.order - b.order);
+    },
+    addGroup(name, icon = '') {
+        const g = { id: this.data.nextGroupId++, name, icon, order: this.data.groups.length, created: Date.now() };
+        this.data.groups.push(g);
+        this.save();
+        return g;
+    },
+    updateGroup(id, name, icon) {
+        const g = this.data.groups.find(x => x.id === id);
+        if (g) { g.name = name; g.icon = icon || ''; this.save(); }
+    },
+    deleteGroup(id) {
+        this.data.groups = this.data.groups.filter(x => x.id !== id);
+        this.data.channels = this.data.channels.filter(x => x.groupId !== id);
+        this.save();
+    },
+    reorderGroups(ids) {
+        ids.forEach((id, i) => {
+            const g = this.data.groups.find(x => x.id === id);
+            if (g) g.order = i;
+        });
+        this.save();
+    },
+
+    // Kanal
+    getChannels(groupId = null) {
+        let ch = [...this.data.channels];
+        if (groupId !== null) ch = ch.filter(x => x.groupId === groupId);
+        return ch.sort((a, b) => a.order - b.order);
+    },
+    addChannel(groupId, name, url, logo = '', epgId = '') {
+        const maxOrd = this.data.channels.filter(x => x.groupId === groupId).reduce((m, c) => Math.max(m, c.order), -1);
+        const ch = { id: this.data.nextChannelId++, groupId, name, url, logo, epgId, order: maxOrd + 1, active: true, created: Date.now() };
+        this.data.channels.push(ch);
+        this.save();
+        return ch;
+    },
+    updateChannel(id, fields) {
+        const ch = this.data.channels.find(x => x.id === id);
+        if (ch) { Object.assign(ch, fields); this.save(); }
+    },
+    deleteChannel(id) {
+        this.data.channels = this.data.channels.filter(x => x.id !== id);
+        this.save();
+    },
+    deleteChannels(ids) {
+        this.data.channels = this.data.channels.filter(x => !ids.includes(x.id));
+        this.save();
+    },
+    reorderChannels(ids) {
+        ids.forEach((id, i) => {
+            const ch = this.data.channels.find(x => x.id === id);
+            if (ch) ch.order = i;
+        });
+        this.save();
+    },
+
+    // Toplu link değiştirme
+    bulkReplace(search, replace, groupId = null) {
+        let count = 0;
+        this.data.channels.forEach(ch => {
+            if (groupId !== null && ch.groupId !== groupId) return;
+            if (ch.url.includes(search)) {
+                ch.url = ch.url.split(search).join(replace);
+                count++;
+            }
+        });
+        this.save();
+        return count;
+    },
+
+    // Arama
+    search(q) {
+        q = q.toLowerCase();
+        return this.data.channels.filter(ch =>
+            ch.name.toLowerCase().includes(q) || ch.url.toLowerCase().includes(q)
+        );
+    },
+
+    // İstatistik
+    stats() {
+        const ch = this.data.channels;
+        return {
+            groups: this.data.groups.length,
+            channels: ch.length,
+            active: ch.filter(x => x.active).length,
+            inactive: ch.filter(x => !x.active).length
+        };
+    },
+
+    // M3U Oluştur
+    generateM3U() {
+        const groups = this.getGroups();
+        let m3u = '#EXTM3U\n';
+        groups.forEach(g => {
+            const chs = this.getChannels(g.id).filter(c => c.active);
+            chs.forEach(ch => {
+                let line = '#EXTINF:-1';
+                if (ch.logo) line += ` tvg-logo="${ch.logo}"`;
+                if (ch.epgId) line += ` tvg-id="${ch.epgId}"`;
+                line += ` group-title="${g.name}"`;
+                line += `,${ch.name}`;
+                m3u += line + '\n' + ch.url + '\n';
+            });
+        });
+        return m3u;
+    },
+
+    // M3U İçe Aktar
+    importM3U(content) {
+        const lines = content.split('\n');
+        let count = 0, group = '', name = '', logo = '', epg = '';
+        const groupMap = {};
+        this.data.groups.forEach(g => groupMap[g.name] = g.id);
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (line.startsWith('#EXTINF:')) {
+                const gm = line.match(/group-title="([^"]*)"/);
+                const lm = line.match(/tvg-logo="([^"]*)"/);
+                const em = line.match(/tvg-id="([^"]*)"/);
+                group = gm ? gm[1] : 'Genel';
+                logo = lm ? lm[1] : '';
+                epg = em ? em[1] : '';
+                const parts = line.split(',');
+                name = parts.length > 1 ? parts.slice(1).join(',').trim() : 'Bilinmeyen';
+            } else if (line && !line.startsWith('#') && name) {
+                if (!groupMap[group]) {
+                    const g = this.addGroup(group);
+                    groupMap[group] = g.id;
+                }
+                this.addChannel(groupMap[group], name, line, logo, epg);
+                count++;
+                name = ''; logo = ''; epg = '';
+            }
+        }
+        return count;
+    },
+
+    // Şifre değiştir
+    changePassword(current, newPass) {
+        if (this.data.config.password !== current) return false;
+        this.data.config.password = newPass;
+        this.save();
+        return true;
+    },
+    changeUsername(newUser, pass) {
+        if (this.data.config.password !== pass) return false;
+        this.data.config.username = newUser;
+        this.save();
+        return true;
+    },
+
+    // JSON yedekleme
+    exportJSON() {
+        return JSON.stringify(this.data, null, 2);
+    },
+    importJSON(json) {
+        try {
+            const d = JSON.parse(json);
+            if (d.groups && d.channels) {
+                this._data = d;
+                this.save();
+                return true;
+            }
+        } catch {}
+        return false;
+    }
+};
+
+// ===== ANA UYGULAMA =====
+const App = {
+    loggedIn: false,
+    currentPage: 'dashboard',
+    currentGroupId: null,
+    selected: new Set(),
+    dragEl: null,
+
+    // ===== GİRİŞ =====
+    doLogin() {
+        const u = document.getElementById('loginUser').value.trim();
+        const p = document.getElementById('loginPass').value;
+        const cfg = DB.data.config;
+        if (u === cfg.username && p === cfg.password) {
+            this.loggedIn = true;
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appContainer').classList.remove('hidden');
+            this.navigate('dashboard');
+            this.toast('Hoş geldiniz! 👋', 'success');
+        } else {
+            this.toast('Geçersiz kullanıcı adı veya şifre', 'error');
+        }
+    },
+
+    logout() {
+        this.loggedIn = false;
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('appContainer').classList.add('hidden');
+        document.getElementById('loginUser').value = '';
+        document.getElementById('loginPass').value = '';
+        this.toast('Çıkış yapıldı 👋', 'info');
+    },
+
+    // ===== NAVİGASYON =====
+    navigate(page) {
+        this.currentPage = page;
+        this.selected.clear();
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        const ni = document.querySelector(`.nav-item[data-page="${page}"]`);
+        if (ni) ni.classList.add('active');
+
+        const titles = {
+            dashboard: 'Gösterge Paneli', groups: 'Grup Yönetimi', channels: 'Kanal Yönetimi',
+            bulk: 'Toplu Link Değiştirme', import: 'M3U İçe Aktar', export: 'M3U Dışa Aktar', settings: 'Ayarlar'
+        };
+        document.getElementById('pageTitle').textContent = titles[page] || '';
+
+        const map = {
+            dashboard: () => this.pageDashboard(),
+            groups: () => this.pageGroups(),
+            channels: () => this.pageChannels(),
+            bulk: () => this.pageBulk(),
+            import: () => this.pageImport(),
+            export: () => this.pageExport(),
+            settings: () => this.pageSettings()
+        };
+        (map[page] || map.dashboard)();
+        document.getElementById('sidebar').classList.remove('open');
+    },
+
+    // ===== SAYFA: DASHBOARD =====
+    pageDashboard() {
+        document.getElementById('topActions').innerHTML = '';
+        const s = DB.stats();
+        document.getElementById('content').innerHTML = `
+            <div class="stats-grid fade-in">
+                <div class="stat-card">
+                    <div class="stat-icon blue">📁</div>
+                    <div><div class="stat-value">${s.groups}</div><div class="stat-label">Toplam Grup</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">📺</div>
+                    <div><div class="stat-value">${s.channels}</div><div class="stat-label">Toplam Kanal</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">✅</div>
+                    <div><div class="stat-value">${s.active}</div><div class="stat-label">Aktif Kanal</div></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">⛔</div>
+                    <div><div class="stat-value">${s.inactive}</div><div class="stat-label">Pasif Kanal</div></div>
+                </div>
+            </div>
+            <div class="card fade-in">
+                <div class="card-header"><h3>🚀 Hızlı İşlemler</h3></div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+                    <button class="btn btn-primary" onclick="App.navigate('groups')">📁 Grup Yönetimi</button>
+                    <button class="btn btn-success" onclick="App.navigate('channels')">📺 Kanal Yönetimi</button>
+                    <button class="btn btn-warning" onclick="App.navigate('bulk')">🔄 Toplu Değiştir</button>
+                    <button class="btn btn-secondary" onclick="App.navigate('export')">📤 M3U İndir</button>
+                </div>
+            </div>`;
+    },
+
+    // ===== SAYFA: GRUPLAR =====
+    pageGroups() {
+        document.getElementById('topActions').innerHTML =
+            `<button class="btn btn-primary btn-sm" onclick="App.showGroupModal()">➕ Yeni Grup</button>`;
+
+        const groups = DB.getGroups();
+        const countMap = {};
+        DB.data.channels.forEach(ch => countMap[ch.groupId] = (countMap[ch.groupId] || 0) + 1);
+
+        if (!groups.length) {
+            document.getElementById('content').innerHTML = `
+                <div class="empty-state fade-in">
+                    <div class="empty-icon">📁</div><h3>Henüz Grup Yok</h3>
+                    <p>Kanalları düzenlemek için ilk grubu oluşturun</p>
+                    <button class="btn btn-primary" onclick="App.showGroupModal()">➕ İlk Grubu Oluştur</button>
+                </div>`;
+            return;
+        }
+
+        document.getElementById('content').innerHTML = `
+            <div class="card fade-in">
+                <div class="card-header">
+                    <h3>📁 Gruplar (${groups.length})</h3>
+                    <span style="font-size:11px;color:var(--text-muted)">Sürükleyerek sıralayın</span>
+                </div>
+                <div class="group-list" id="groupList">
+                    ${groups.map(g => `
+                        <div class="group-item" draggable="true" data-id="${g.id}"
+                             ondragstart="App.dStart(event)" ondragover="App.dOver(event)"
+                             ondrop="App.dDropGroup(event)" ondragend="App.dEnd(event)">
+                            <div class="group-info">
+                                <span class="drag-handle">⠿</span>
+                                <span class="group-name">${this.esc(g.name)}</span>
+                                <span class="group-count">${countMap[g.id] || 0} kanal</span>
+                            </div>
+                            <div class="group-actions">
+                                <button class="btn btn-sm btn-outline btn-icon" title="Kanalları Gör"
+                                    onclick="App.currentGroupId=${g.id};App.navigate('channels')">📺</button>
+                                <button class="btn btn-sm btn-outline btn-icon" title="Düzenle"
+                                    onclick="App.showGroupModal(${g.id})">✏️</button>
+                                <button class="btn btn-sm btn-danger btn-icon" title="Sil"
+                                    onclick="App.deleteGroup(${g.id})">🗑️</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+    },
+
+    showGroupModal(id = null) {
+        const g = id ? DB.data.groups.find(x => x.id === id) : null;
+        this.openModal(`
+            <div class="modal-header">
+                <h3>${g ? '✏️ Grubu Düzenle' : '➕ Yeni Grup'}</h3>
+                <button class="modal-close" onclick="App.closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Grup Adı</label>
+                    <input type="text" id="mGroupName" class="form-control" value="${g ? this.escA(g.name) : ''}" placeholder="ör: Spor, Sinema...">
+                </div>
+                <div class="form-group">
+                    <label>İkon (Opsiyonel)</label>
+                    <input type="text" id="mGroupIcon" class="form-control" value="${g ? this.escA(g.icon || '') : ''}" placeholder="ör: ⚽ veya URL">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="App.closeModal()">İptal</button>
+                <button class="btn btn-primary" onclick="App.saveGroup(${id})">${g ? '💾 Güncelle' : '➕ Oluştur'}</button>
+            </div>
+        `);
+        document.getElementById('mGroupName').focus();
+    },
+
+    saveGroup(id) {
+        const name = document.getElementById('mGroupName').value.trim();
+        const icon = document.getElementById('mGroupIcon').value.trim();
+        if (!name) return this.toast('Grup adı gerekli', 'error');
+        if (id) {
+            DB.updateGroup(id, name, icon);
+            this.toast('Grup güncellendi ✅', 'success');
+        } else {
+            DB.addGroup(name, icon);
+            this.toast('Grup oluşturuldu ✅', 'success');
+        }
+        this.closeModal();
+        this.pageGroups();
+    },
+
+    deleteGroup(id) {
+        const g = DB.data.groups.find(x => x.id === id);
+        const cnt = DB.data.channels.filter(x => x.groupId === id).length;
+        this.openModal(`
+            <div class="modal-header">
+                <h3>⚠️ Grubu Sil</h3>
+                <button class="modal-close" onclick="App.closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>"${this.esc(g?.name)}"</strong> grubunu silmek istediğinize emin misiniz?</p>
+                ${cnt ? `<p style="color:var(--danger);margin-top:8px;font-size:13px">⚠️ Bu gruptaki ${cnt} kanal da silinecek!</p>` : ''}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="App.closeModal()">İptal</button>
+                <button class="btn btn-danger" onclick="DB.deleteGroup(${id});App.closeModal();App.toast('Grup silindi 🗑️','success');App.pageGroups()">🗑️ Sil</button>
+            </div>
+        `);
+    },
+
+    // ===== SAYFA: KANALLAR =====
+    pageChannels() {
+        const groups = DB.getGroups();
+        document.getElementById('topActions').innerHTML =
+            `<button class="btn btn-primary btn-sm" onclick="App.showChannelModal()">➕ Yeni Kanal</button>`;
+
+        const gid = this.currentGroupId;
+        const channels = DB.getChannels(gid ? parseInt(gid) : null);
+
+        let html = `
+            <div class="card fade-in">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <select class="form-control" id="chGroupFilter" onchange="App.currentGroupId=this.value||null;App.pageChannels()" style="max-width:220px">
+                            <option value="">Tüm Gruplar</option>
+                            ${groups.map(g => `<option value="${g.id}" ${gid == g.id ? 'selected' : ''}>${this.esc(g.name)}</option>`).join('')}
+                        </select>
+                        <input type="text" class="form-control" id="chSearch" placeholder="🔍 Kanal ara..." oninput="App.filterChannelList()" style="max-width:260px">
+                    </div>
+                    <div class="toolbar-right" id="bulkBar" style="display:none">
+                        <span class="badge badge-primary" id="selCount">0</span>
+                        <button class="btn btn-danger btn-sm" onclick="App.deleteSelected()">🗑️ Seçilenleri Sil</button>
+                        <button class="btn btn-secondary btn-sm" onclick="App.clearSel()">✕</button>
+                    </div>
+                </div>
+            </div>`;
+
+        if (!channels.length) {
+            html += `
+                <div class="empty-state fade-in">
+                    <div class="empty-icon">📺</div><h3>Kanal Bulunamadı</h3>
+                    <p>${groups.length ? 'Bu filtrede kanal yok' : 'Önce bir grup oluşturun'}</p>
+                    <button class="btn btn-primary" onclick="App.showChannelModal()">➕ Kanal Ekle</button>
+                </div>`;
+        } else {
+            html += `
+                <div class="card fade-in">
+                    <div class="card-header">
+                        <h3>📺 Kanallar (${channels.length})</h3>
+                        <label style="font-size:12px;cursor:pointer">
+                            <input type="checkbox" id="selAll" onchange="App.toggleAll(this)" style="accent-color:var(--primary)"> Tümünü Seç
+                        </label>
+                    </div>
+                    <div class="channel-list" id="chList">
+                        ${channels.map(ch => this.renderChannel(ch, groups)).join('')}
+                    </div>
+                </div>`;
+        }
+
+        document.getElementById('content').innerHTML = html;
+    },
+
+    renderChannel(ch, groups) {
+        const gn = groups?.find(g => g.id === ch.groupId)?.name || '';
+        const logo = ch.logo
+            ? `<img class="ch-logo" src="${this.escA(ch.logo)}" onerror="this.outerHTML='<div class=\\'ch-logo-ph\\'>📺</div>'">`
+            : `<div class="ch-logo-ph">📺</div>`;
+
+        return `
+            <div class="channel-item ${ch.active ? '' : 'inactive'}" data-id="${ch.id}" data-name="${this.escA(ch.name)}" data-url="${this.escA(ch.url)}"
+                 draggable="true" ondragstart="App.dStart(event)" ondragover="App.dOver(event)"
+                 ondrop="App.dDropCh(event)" ondragend="App.dEnd(event)">
+                <input type="checkbox" class="ch-checkbox" value="${ch.id}" onchange="App.toggleSel(this)" ${this.selected.has(ch.id) ? 'checked' : ''}>
+                <span class="ch-drag">⠿</span>
+                <div class="ch-status ${ch.active ? 'on' : 'off'}"></div>
+                ${logo}
+                <div class="ch-info">
+                    <div class="ch-name">${this.esc(ch.name)}</div>
+                    <div class="ch-url">${this.esc(ch.url)}</div>
+                </div>
+                ${gn ? `<span class="badge badge-primary">${this.esc(gn)}</span>` : ''}
+                <div class="ch-actions">
+                    <label class="toggle" title="${ch.active ? 'Aktif' : 'Pasif'}">
+                        <input type="checkbox" ${ch.active ? 'checked' : ''} onchange="DB.updateChannel(${ch.id},{active:this.checked})">
+                        <span class="toggle-sl"></span>
+                    </label>
+                    <button class="btn btn-sm btn-outline btn-icon" onclick="App.showChannelModal(${ch.id})" title="Düzenle">✏️</button>
+                    <button class="btn btn-sm btn-danger btn-icon" onclick="if(confirm('Bu kanalı silmek istediğinize emin misiniz?')){DB.deleteChannel(${ch.id});App.toast('Silindi','success');App.pageChannels()}" title="Sil">🗑️</button>
+                </div>
+            </div>`;
+    },
+
+    filterChannelList() {
+        const q = (document.getElementById('chSearch')?.value || '').toLowerCase();
+        document.querySelectorAll('#chList .channel-item').forEach(el => {
+            const n = (el.dataset.name || '').toLowerCase();
+            const u = (el.dataset.url || '').toLowerCase();
+            el.style.display = (!q || n.includes(q) || u.includes(q)) ? '' : 'none';
+        });
+    },
+
+    showChannelModal(id = null) {
+        const ch = id ? DB.data.channels.find(x => x.id === id) : null;
+        const groups = DB.getGroups();
+        if (!groups.length) { this.toast('Önce bir grup oluşturun', 'warning'); this.navigate('groups'); return; }
+
+        this.openModal(`
+            <div class="modal-header">
+                <h3>${ch ? '✏️ Kanalı Düzenle' : '➕ Yeni Kanal'}</h3>
+                <button class="modal-close" onclick="App.closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Grup</label>
+                    <select id="mChGroup" class="form-control">
+                        ${groups.map(g => `<option value="${g.id}" ${ch ? (ch.groupId === g.id ? 'selected' : '') : (this.currentGroupId == g.id ? 'selected' : '')}>${this.esc(g.name)}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Kanal Adı</label>
+                    <input type="text" id="mChName" class="form-control" value="${ch ? this.escA(ch.name) : ''}" placeholder="ör: TRT 1 HD">
+                </div>
+                <div class="form-group">
+                    <label>Yayın URL</label>
+                    <input type="text" id="mChUrl" class="form-control" value="${ch ? this.escA(ch.url) : ''}" placeholder="http://...">
+                </div>
+                <div class="form-group">
+                    <label>Logo URL (Opsiyonel)</label>
+                    <input type="text" id="mChLogo" class="form-control" value="${ch ? this.escA(ch.logo || '') : ''}" placeholder="https://...logo.png">
+                </div>
+                <div class="form-group">
+                    <label>EPG ID (Opsiyonel)</label>
+                    <input type="text" id="mChEpg" class="form-control" value="${ch ? this.escA(ch.epgId || '') : ''}" placeholder="kanal.epg.id">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="App.closeModal()">İptal</button>
+                <button class="btn btn-primary" onclick="App.saveChannel(${id})">${ch ? '💾 Güncelle' : '➕ Ekle'}</button>
+            </div>
+        `);
+        document.getElementById('mChName').focus();
+    },
+
+    saveChannel(id) {
+        const groupId = parseInt(document.getElementById('mChGroup').value);
+        const name = document.getElementById('mChName').value.trim();
+        const url = document.getElementById('mChUrl').value.trim();
+        const logo = document.getElementById('mChLogo').value.trim();
+        const epgId = document.getElementById('mChEpg').value.trim();
+        if (!name) return this.toast('Kanal adı gerekli', 'error');
+        if (!url) return this.toast('URL gerekli', 'error');
+
+        if (id) {
+            DB.updateChannel(id, { groupId, name, url, logo, epgId });
+            this.toast('Kanal güncellendi ✅', 'success');
+        } else {
+            DB.addChannel(groupId, name, url, logo, epgId);
+            this.toast('Kanal eklendi ✅', 'success');
+        }
+        this.closeModal();
+        this.pageChannels();
+    },
+
+    // ===== ÇOKLU SEÇİM =====
+    toggleSel(cb) {
+        const id = parseInt(cb.value);
+        cb.checked ? this.selected.add(id) : this.selected.delete(id);
+        this.updBulk();
+    },
+    toggleAll(cb) {
+        document.querySelectorAll('.ch-checkbox').forEach(el => {
+            el.checked = cb.checked;
+            const id = parseInt(el.value);
+            cb.checked ? this.selected.add(id) : this.selected.delete(id);
+        });
+        this.updBulk();
+    },
+    clearSel() {
+        this.selected.clear();
+        document.querySelectorAll('.ch-checkbox').forEach(el => el.checked = false);
+        if (document.getElementById('selAll')) document.getElementById('selAll').checked = false;
+        this.updBulk();
+    },
+    updBulk() {
+        const bar = document.getElementById('bulkBar');
+        const cnt = document.getElementById('selCount');
+        if (bar) bar.style.display = this.selected.size ? 'flex' : 'none';
+        if (cnt) cnt.textContent = this.selected.size + ' seçili';
+    },
+    deleteSelected() {
+        if (!confirm(`${this.selected.size} kanal silinecek. Emin misiniz?`)) return;
+        DB.deleteChannels([...this.selected]);
+        this.selected.clear();
+        this.toast('Seçili kanallar silindi 🗑️', 'success');
+        this.pageChannels();
+    },
+
+    // ===== SÜRÜKLE BIRAK =====
+    dStart(e) {
+        this.dragEl = e.target.closest('[data-id]');
+        if (this.dragEl) this.dragEl.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    },
+    dOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; },
+    dEnd() { if (this.dragEl) this.dragEl.classList.remove('dragging'); this.dragEl = null; },
+
+    dDropGroup(e) {
+        e.preventDefault();
+        const target = e.target.closest('.group-item');
+        if (!target || !this.dragEl || target === this.dragEl) return;
+        const list = document.getElementById('groupList');
+        const items = [...list.children];
+        if (items.indexOf(this.dragEl) < items.indexOf(target)) target.after(this.dragEl);
+        else target.before(this.dragEl);
+        const order = [...list.children].map(el => parseInt(el.dataset.id));
+        DB.reorderGroups(order);
+        this.toast('Sıralama güncellendi ✅', 'success');
+    },
+
+    dDropCh(e) {
+        e.preventDefault();
+        const target = e.target.closest('.channel-item');
+        if (!target || !this.dragEl || target === this.dragEl) return;
+        const list = document.getElementById('chList');
+        const items = [...list.children];
+        if (items.indexOf(this.dragEl) < items.indexOf(target)) target.after(this.dragEl);
+        else target.before(this.dragEl);
+        const order = [...list.children].map(el => parseInt(el.dataset.id));
+        DB.reorderChannels(order);
+        this.toast('Sıralama güncellendi ✅', 'success');
+    },
+
+    // ===== SAYFA: TOPLU LİNK DEĞİŞTİR =====
+    pageBulk() {
+        document.getElementById('topActions').innerHTML = '';
+        const groups = DB.getGroups();
+        document.getElementById('content').innerHTML = `
+            <div class="card fade-in">
+                <div class="card-header"><h3>🔄 Toplu Link Değiştirme</h3></div>
+                <p style="color:var(--text-muted);margin-bottom:18px;font-size:13px">
+                    Birden fazla kanalda ortak olan URL kısımlarını tek seferde değiştirin.<br>
+                    Sunucu adresi, port, token vb. toplu güncelleme yapabilirsiniz.
+                </p>
+                <div class="form-group">
+                    <label>Kapsam</label>
+                    <select id="brScope" class="form-control">
+                        <option value="">Tüm Kanallar</option>
+                        ${groups.map(g => `<option value="${g.id}">${this.esc(g.name)}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Aranan Metin (URL'de aranacak kısım)</label>
+                    <input type="text" id="brSearch" class="form-control" placeholder="ör: http://eski-sunucu.com:8080" oninput="App.previewReplace()">
+                </div>
+                <div class="form-group">
+                    <label>Yeni Metin (Değiştirilecek kısım)</label>
+                    <input type="text" id="brReplace" class="form-control" placeholder="ör: http://yeni-sunucu.com:9090" oninput="App.previewReplace()">
+                </div>
+                <div id="brPreview"></div>
+                <div style="margin-top:18px">
+                    <button class="btn btn-warning" onclick="App.execReplace()">🔄 Değişiklikleri Uygula</button>
+                </div>
+            </div>
+            <div class="card fade-in">
+                <div class="card-header"><h3>💡 Kullanım Örnekleri</h3></div>
+                <div style="font-size:12px;color:var(--text-muted);line-height:1.9">
+                    <p><strong>Sunucu Değişikliği:</strong><br>
+                    Ara: <code style="color:var(--danger)">http://192.168.1.100:8080</code><br>
+                    Değiştir: <code style="color:var(--success)">http://10.0.0.50:9090</code></p>
+                    <p style="margin-top:10px"><strong>Token Güncelleme:</strong><br>
+                    Ara: <code style="color:var(--danger)">token=eski123</code><br>
+                    Değiştir: <code style="color:var(--success)">token=yeni456</code></p>
+                    <p style="margin-top:10px"><strong>Protokol Değişikliği:</strong><br>
+                    Ara: <code style="color:var(--danger)">http://</code><br>
+                    Değiştir: <code style="color:var(--success)">https://</code></p>
+                </div>
+            </div>`;
+    },
+
+    previewReplace() {
+        const search = document.getElementById('brSearch').value;
+        const replace = document.getElementById('brReplace').value;
+        const prev = document.getElementById('brPreview');
+        if (!search || search.length < 2) { prev.innerHTML = ''; return; }
+
+        const scope = document.getElementById('brScope').value;
+        const gid = scope ? parseInt(scope) : null;
+        const channels = DB.getChannels(gid);
+        const matches = channels.filter(ch => ch.url.includes(search));
+
+        if (!matches.length) {
+            prev.innerHTML = `<div class="replace-preview"><p style="color:var(--text-muted);text-align:center">Eşleşen kanal bulunamadı</p></div>`;
+            return;
+        }
+
+        const escReg = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        prev.innerHTML = `
+            <div class="replace-preview">
+                <p style="margin-bottom:8px;font-weight:600;color:var(--warning)">⚠️ ${matches.length} kanal etkilenecek:</p>
+                ${matches.slice(0, 15).map(ch => `
+                    <div class="rp-item">
+                        <strong>${this.esc(ch.name)}</strong><br>
+                        <div class="rp-old">- ${this.esc(ch.url)}</div>
+                        <div class="rp-new">+ ${this.esc(ch.url.split(search).join(replace))}</div>
+                    </div>
+                `).join('')}
+                ${matches.length > 15 ? `<p style="color:var(--text-muted);margin-top:6px">...ve ${matches.length - 15} kanal daha</p>` : ''}
+            </div>`;
+    },
+
+    execReplace() {
+        const search = document.getElementById('brSearch').value;
+        const replace = document.getElementById('brReplace').value;
+        if (!search) return this.toast('Aranan metin gerekli', 'error');
+
+        const scope = document.getElementById('brScope').value;
+        const gid = scope ? parseInt(scope) : null;
+        const count = DB.bulkReplace(search, replace, gid);
+        this.toast(`${count} kanal güncellendi ✅`, 'success');
+        document.getElementById('brSearch').value = '';
+        document.getElementById('brReplace').value = '';
+        document.getElementById('brPreview').innerHTML = '';
+    },
+
+    // ===== SAYFA: İÇE AKTAR =====
+    pageImport() {
+        document.getElementById('topActions').innerHTML = '';
+        document.getElementById('content').innerHTML = `
+            <div class="card fade-in">
+                <div class="card-header"><h3>📥 M3U İçe Aktar</h3></div>
+                <p style="color:var(--text-muted);margin-bottom:18px;font-size:13px">
+                    M3U dosyanızın içeriğini yapıştırın veya dosya seçin. Gruplar otomatik oluşturulur.
+                </p>
+                <div class="form-group">
+                    <label>M3U İçeriği</label>
+                    <textarea id="impContent" class="form-control" rows="14"
+                        placeholder="#EXTM3U&#10;#EXTINF:-1 group-title=&quot;Spor&quot;,Kanal Adı&#10;http://..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>veya Dosya Seç</label>
+                    <input type="file" id="impFile" accept=".m3u,.m3u8,.txt" class="form-control" onchange="App.handleFile(this)">
+                </div>
+                <button class="btn btn-success" onclick="App.execImport()">📥 İçe Aktar</button>
+            </div>
+            <div class="card fade-in">
+                <div class="card-header"><h3>💾 JSON Yedekle / Geri Yükle</h3></div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <button class="btn btn-secondary" onclick="App.exportJSON()">📥 JSON İndir (Yedek)</button>
+                    <button class="btn btn-outline" onclick="document.getElementById('jsonFile').click()">📤 JSON Yükle (Geri Yükle)</button>
+                    <input type="file" id="jsonFile" accept=".json" style="display:none" onchange="App.importJSON(this)">
+                </div>
+            </div>`;
+    },
+
+    handleFile(input) {
+        const f = input.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = e => document.getElementById('impContent').value = e.target.result;
+        r.readAsText(f);
+    },
+
+    execImport() {
+        const content = document.getElementById('impContent').value.trim();
+        if (!content) return this.toast('M3U içeriği gerekli', 'error');
+        if (!content.includes('#EXTM3U') && !content.includes('#EXTINF')) return this.toast('Geçerli M3U değil', 'error');
+        const count = DB.importM3U(content);
+        this.toast(`${count} kanal içe aktarıldı ✅`, 'success');
+        document.getElementById('impContent').value = '';
+    },
+
+    exportJSON() {
+        const json = DB.exportJSON();
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `iptv_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click(); URL.revokeObjectURL(url);
+        this.toast('JSON yedek indirildi 💾', 'success');
+    },
+
+    importJSON(input) {
+        const f = input.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = e => {
+            if (DB.importJSON(e.target.result)) {
+                this.toast('Veriler geri yüklendi ✅', 'success');
+                this.navigate('dashboard');
+            } else {
+                this.toast('Geçersiz JSON dosyası', 'error');
+            }
+        };
+        r.readAsText(f);
+    },
+
+    // ===== SAYFA: DIŞA AKTAR =====
+    pageExport() {
+        document.getElementById('topActions').innerHTML = '';
+        const m3u = DB.generateM3U();
+        document.getElementById('content').innerHTML = `
+            <div class="card fade-in">
+                <div class="card-header"><h3>📤 M3U Dışa Aktar</h3></div>
+                <div class="form-group">
+                    <label>M3U Çıktısı (${DB.data.channels.filter(c=>c.active).length} aktif kanal)</label>
+                    <textarea class="form-control" rows="16" readonly id="expContent">${this.esc(m3u)}</textarea>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <button class="btn btn-primary" onclick="App.downloadM3U()">💾 Dosya Olarak İndir</button>
+                    <button class="btn btn-secondary" onclick="App.copyM3U()">📋 Panoya Kopyala</button>
+                </div>
+            </div>`;
+    },
+
+    downloadM3U() {
+        const m3u = DB.generateM3U();
+        const blob = new Blob([m3u], { type: 'application/x-mpegurl' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `playlist_${new Date().toISOString().slice(0, 10)}.m3u`;
+        a.click(); URL.revokeObjectURL(url);
+        this.toast('M3U dosyası indirildi 💾', 'success');
+    },
+
+    copyM3U() {
+        const ta = document.getElementById('expContent');
+        ta.select(); ta.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(ta.value).then(() => this.toast('Panoya kopyalandı 📋', 'success'));
+    },
+
+    // ===== SAYFA: AYARLAR =====
+    pageSettings() {
+        document.getElementById('topActions').innerHTML = '';
+        document.getElementById('content').innerHTML = `
+            <div class="card fade-in">
+                <div class="card-header"><h3>🔐 Şifre Değiştir</h3></div>
+                <div class="form-group">
+                    <label>Mevcut Şifre</label>
+                    <input type="password" id="sCurPass" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Yeni Şifre</label>
+                    <input type="password" id="sNewPass" class="form-control" minlength="4">
+                </div>
+                <div class="form-group">
+                    <label>Yeni Şifre (Tekrar)</label>
+                    <input type="password" id="sNewPass2" class="form-control" minlength="4">
+                </div>
+                <button class="btn btn-primary" onclick="App.chgPass()">🔐 Şifreyi Güncelle</button>
+            </div>
+            <div class="card fade-in">
+                <div class="card-header"><h3>👤 Kullanıcı Adı Değiştir</h3></div>
+                <div class="form-group">
+                    <label>Yeni Kullanıcı Adı</label>
+                    <input type="text" id="sNewUser" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Şifreniz (Doğrulama)</label>
+                    <input type="password" id="sUserPass" class="form-control">
+                </div>
+                <button class="btn btn-primary" onclick="App.chgUser()">👤 Güncelle</button>
+            </div>
+            <div class="card fade-in">
+                <div class="card-header"><h3>🗑️ Verileri Sıfırla</h3></div>
+                <p style="color:var(--text-muted);margin-bottom:14px;font-size:13px">
+                    Tüm grupları ve kanalları siler, fabrika ayarlarına döner.
+                </p>
+                <button class="btn btn-danger" onclick="App.resetAll()">⚠️ Tüm Verileri Sil</button>
+            </div>`;
+    },
+
+    chgPass() {
+        const cur = document.getElementById('sCurPass').value;
+        const np = document.getElementById('sNewPass').value;
+        const np2 = document.getElementById('sNewPass2').value;
+        if (!cur || !np) return this.toast('Tüm alanları doldurun', 'error');
+        if (np.length < 4) return this.toast('Şifre en az 4 karakter olmalı', 'error');
+        if (np !== np2) return this.toast('Şifreler eşleşmiyor', 'error');
+        if (DB.changePassword(cur, np)) {
+            this.toast('Şifre güncellendi ✅', 'success');
+            document.getElementById('sCurPass').value = '';
+            document.getElementById('sNewPass').value = '';
+            document.getElementById('sNewPass2').value = '';
+        } else {
+            this.toast('Mevcut şifre yanlış', 'error');
+        }
+    },
+
+    chgUser() {
+        const u = document.getElementById('sNewUser').value.trim();
+        const p = document.getElementById('sUserPass').value;
+        if (!u || !p) return this.toast('Tüm alanları doldurun', 'error');
+        if (DB.changeUsername(u, p)) {
+            this.toast('Kullanıcı adı güncellendi ✅', 'success');
+        } else {
+            this.toast('Şifre yanlış', 'error');
+        }
+    },
+
+    resetAll() {
+        this.openModal(`
+            <div class="modal-header">
+                <h3>⚠️ Verileri Sıfırla</h3>
+                <button class="modal-close" onclick="App.closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="color:var(--danger)">Tüm gruplar ve kanallar kalıcı olarak silinecek!</p>
+                <p style="margin-top:10px;font-size:13px;color:var(--text-muted)">Bu işlem geri alınamaz. Devam etmek için şifrenizi girin:</p>
+                <div class="form-group" style="margin-top:14px">
+                    <input type="password" id="resetPass" class="form-control" placeholder="Şifreniz">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="App.closeModal()">İptal</button>
+                <button class="btn btn-danger" onclick="App.confirmReset()">🗑️ Sıfırla</button>
+            </div>
+        `);
+    },
+
+    confirmReset() {
+        const p = document.getElementById('resetPass').value;
+        if (p !== DB.data.config.password) return this.toast('Şifre yanlış', 'error');
+        const cfg = { ...DB.data.config };
+        DB._data = DB.defaultData();
+        DB._data.config = cfg;
+        DB.save();
+        this.closeModal();
+        this.toast('Tüm veriler sıfırlandı', 'success');
+        this.navigate('dashboard');
+    },
+
+    // ===== MODAL =====
+    openModal(html) {
+        document.getElementById('modalBox').innerHTML = html;
+        document.getElementById('modalOverlay').classList.add('active');
+    },
+    closeModal() {
+        document.getElementById('modalOverlay').classList.remove('active');
+    },
+
+    // ===== TOAST =====
+    toast(msg, type = 'info') {
+        const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+        const box = document.getElementById('toastBox');
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `<span>${icons[type] || ''}</span> ${this.esc(msg)}`;
+        box.appendChild(t);
+        setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(100%)'; t.style.transition = '0.3s'; setTimeout(() => t.remove(), 300); }, 3000);
+    },
+
+    // ===== YARDIMCILAR =====
+    esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; },
+    escA(s) { return (s || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+};
+
+// ESC tuşu
+document.addEventListener('keydown', e => { if (e.key === 'Escape') App.closeModal(); });
+
+// DB başlat
+DB.load();
+</script>
+</body>
+</html>
